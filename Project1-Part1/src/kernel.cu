@@ -209,10 +209,10 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
 
 	glm::vec3 totalAcceleration = glm::vec3(0.0f);
 
-	// Star calculation
+	// Calculate acceleration relative to the start
 	totalAcceleration += gravitationalAccelerationHelper(this_planet, glm::vec3(0.0f), starMass);
 
-	// Planets calculation
+	// Calculate acceleration relative to the other planets
 	for (int i = 0; i < N; i++) {
 		if (i != iSelf) {
 			totalAcceleration += gravitationalAccelerationHelper(this_planet, other_planets[i], planetMass);
@@ -230,9 +230,8 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement updateAccArray.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
-
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
-	// NOTE: Do I need dt? probably.. well we are looking for instantanious acceleration
+
 	acc[index] = accelerate(N, index, pos[index], pos);
 }
 
@@ -242,7 +241,6 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement updateVelocityPosition
-
 	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
 
 	vel[index] = vel[index] + acc[index] * dt;
@@ -255,10 +253,9 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
-
 	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
 
-	// Update acceleration first
+	// Update acceleration
 	kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
 
 	// Update velocity and position
