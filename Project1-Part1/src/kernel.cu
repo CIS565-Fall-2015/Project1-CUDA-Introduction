@@ -170,6 +170,14 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  ******************/
 
 /**
+* Compute the acceleration on a body at `my_pos` due a single other body
+*/
+float gravitationalAccelerationHelper(glm::vec3 this_planet, glm::vec3 other_body, float other_body_mass) {
+	// TODO: Need to protect against dividing by a very small number
+	return (G * other_body_mass) / glm::pow(glm::distance(this_planet, other_body), 2);
+}
+
+/**
  * Compute the acceleration on a body at `my_pos` due to the `N` bodies in the array `other_planets`.
  */
 __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const glm::vec3 *other_planets) {
@@ -189,8 +197,20 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //    * G is the universal gravitational constant (already defined for you)
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
-    
-    return glm::vec3(0.0f);
+
+	float totalAcceleration = 0.0f;
+	// Star calculation
+	totalAcceleration += gravitationalAccelerationHelper(this_planet, glm::vec3(0.0f), starMass);
+
+	// Planets calculation
+	for (int i = 0; i < N; i++) {
+		if (i != iSelf) {
+			totalAcceleration += gravitationalAccelerationHelper(this_planet, other_planets[i], planetMass);
+		}
+	}
+
+	// TODO: I am not confident that this is the correct way to calculate this, or what I am actually trying to calculate
+    return this_planet * totalAcceleration;
 }
 
 /**
