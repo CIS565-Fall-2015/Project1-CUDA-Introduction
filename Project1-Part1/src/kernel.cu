@@ -173,10 +173,13 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
 * Compute the acceleration on a body at `my_pos` due a single other body
 */
 __device__ glm::vec3 gravitationalAccelerationHelper(glm::vec3 this_planet, glm::vec3 other_body, float other_body_mass) {
-	// TODO: Need to protect against dividing by a very small number
-	float distance = glm::distance(this_planet, other_body);
+	// Check our distance squared calculation to protect against dividing by too small a number
+	float distance_squared = glm::pow(glm::distance(this_planet, other_body), 2);
+	if (glm::abs(distance_squared) < EPSILON) {
+		distance_squared = EPSILON;
+	}
 	glm::vec3 unit_direction = glm::normalize(this_planet - other_body);
-	float g = (G * other_body_mass) / glm::pow(distance, 2);
+	float g = (G * other_body_mass) / distance_squared;
 
 	return g * unit_direction;
 }
