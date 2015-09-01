@@ -168,7 +168,15 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
 /******************
  * stepSimulation *
  ******************/
-
+ /* Helper function to compute the acceleration at a single point due to a single other mass.*/
+__device__ float single_acc(float mass, glm::vec3 this_planet, glm::vec3 other_planet) {
+	float sqdist = glm::distance(this_planet, other_planet)*glm::distance(this_planet, other_planet);
+	float a = 0.0f;
+	if (sqdist > 0.00001f) {
+		a = (G*mass) / sqdist;
+	}
+	return a;
+}
 /**
  * Compute the acceleration on a body at `my_pos` due to the `N` bodies in the array `other_planets`.
  */
@@ -177,7 +185,19 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //   * The star at the origin (with mass `starMass`)
     //   * All of the *other* planets (with mass `planetMass`)
     // Return the sum of all of these contributions.
+	float a = 0.0f;
+	glm::vec3 acc = glm::vec3(0.0f);
+	a += single_acc(starMass, this_planet, glm::vec3(0.0f));
+	glm::vec3 dir = glm::normalize(this_planet);
+	acc += a*dir;
 
+	for (int i = 0; i < N; i++) {
+		if (i != iSelf) {
+			a = single_acc(planetMass, this_planet, other_planets[i]);
+			dir = glm::normalize(other_planets[i] - this_planet);
+			acc += a*dir;
+		}
+	}
     // HINT: You may want to write a helper function that will compute the acceleration at
     //   a single point due to a single other mass. Be careful that you protect against
     //   division by very small numbers.
@@ -190,7 +210,7 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
     
-    return glm::vec3(0.0f);
+    return acc;
 }
 
 /**
