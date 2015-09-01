@@ -3,8 +3,8 @@ CUDA Introduction
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 1**
 
-* (TODO) YOUR NAME HERE
-* Tested on: (TODO) Windows 22, i7-2222 @ 2.22GHz 22GB, GTX 222 222MB (Moore 2222 Lab)
+* Megan Moore
+* Tested on: Windows 7, i7-4770 @ 3.40GHz 16GB (Moore 100 Lab C)
 
 ### (TODO: Your README)
 
