@@ -65,3 +65,27 @@ void MatrixMath::initialization(int mat_width, int mat_height) {
 }
 
 // TODO: Create a function to free the memory we allocated
+
+__global__ void kern_mat_add(float *A, float *B, float *C) {
+
+}
+
+__global__ void kern_mat_sub(float *A, float *B, float *C) {
+
+}
+
+__global__ void kern_mat_mul(float *A, float *B, float *C) {
+
+}
+
+void MatrixMath::mat_add(float *A, float *B, float *C) {
+
+}
+
+void MatrixMath::mat_sub(float *A, float *B, float *C) {
+
+}
+
+void MatrixMath::mat_mul(float *A, float *B, float *C) {
+
+}
