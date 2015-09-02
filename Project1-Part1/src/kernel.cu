@@ -245,6 +245,6 @@ void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
 	dim3 fullBlocksPerGrid((int)ceil(float(numObjects) / float(blockSize)));
-
-	kernUpdateVelPos << <fullBlocksPerGrid, blockSize >> >(numObjects, dt, dev_pos, dev_vel, dev_acc);
+	kernUpdateAcc <<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
+	kernUpdateVelPos <<<fullBlocksPerGrid, blockSize >>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
 }
