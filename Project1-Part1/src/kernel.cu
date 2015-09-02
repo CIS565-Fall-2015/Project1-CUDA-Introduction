@@ -172,9 +172,10 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
 __device__ float single_acc(float mass, glm::vec3 this_planet, glm::vec3 other_planet) {
 	float sqdist = glm::distance(this_planet, other_planet)*glm::distance(this_planet, other_planet);
 	float a = 0.0f;
-	if (sqdist > 0.00001f) {
-		a = (G*mass) / sqdist;
+	if (sqdist < EPSILON) {
+		sqdist = EPSILON;
 	}
+	a = (G*mass) / sqdist;
 	return a;
 }
 /**
@@ -187,14 +188,14 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     // Return the sum of all of these contributions.
 	float a = 0.0f;
 	glm::vec3 acc = glm::vec3(0.0f);
-	a += single_acc(starMass, this_planet, glm::vec3(0.0f));
+	a = single_acc(starMass, this_planet, glm::vec3(0.0f));
 	glm::vec3 dir = glm::normalize(this_planet);
 	acc += a*dir;
 
 	for (int i = 0; i < N; i++) {
 		if (i != iSelf) {
 			a = single_acc(planetMass, this_planet, other_planets[i]);
-			dir = glm::normalize(other_planets[i] - this_planet);
+			dir = glm::normalize(this_planet - other_planets[i]);
 			acc += a*dir;
 		}
 	}
@@ -221,6 +222,10 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement updateAccArray.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+
+	int i = threadIdx.x + (blockIdx.x * blockDim.x);
+	acc[i] = accelerate(N, i, pos[i], pos);
+
 }
 
 /**
@@ -229,6 +234,11 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement updateVelocityPosition
+
+	int i = threadIdx.x + (blockIdx.x * blockDim.x);
+	vel[i] += acc[i]*dt;
+	pos[i] += vel[i]*dt;
+
 }
 
 /**
@@ -237,4 +247,8 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
+	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+	kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
+	kernUpdateVelPos<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
+
 }
