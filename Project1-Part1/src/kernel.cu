@@ -273,3 +273,12 @@ void Nbody::stepSimulation(float dt) {
 	kernUpdateAcc<<< fullBlocksPerGrid,blockSize >>>(numObjects,dt,dev_pos,dev_acc);
 	kernUpdateVelPos<<< fullBlocksPerGrid,blockSize >>>(numObjects,dt,dev_pos,dev_vel,dev_acc);
 }
+
+
+
+void Nbody::endSimulation()
+{
+	cudaFree(dev_acc);
+	cudaFree(dev_vel);
+	cudaFree(dev_pos);
+}
