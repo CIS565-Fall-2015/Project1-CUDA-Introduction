@@ -22,6 +22,22 @@ void checkCUDAError(const char *msg, int line = -1) {
     }
 }
 
+/****************************
+* Cuda performance rating *
+****************************/
+#define PERFORMANCE_RATE
+
+#ifdef PERFORMANCE_RATE
+
+cudaEvent_t beginEvent;
+cudaEvent_t endEvent;
+const int update_times_start = 100;
+const int update_times_end = 200;
+int update_counts;
+
+#endif
+
+
 
 /*****************
  * Configuration *
@@ -112,6 +128,13 @@ __global__ void kernGenerateCircularVelArray(int time, int N, glm::vec3 * arr, g
 void Nbody::initSimulation(int N) {
     numObjects = N;
     dim3 fullBlocksPerGrid((N + blockSize - 1) / blockSize);
+
+#ifdef PERFORMANCE_RATE
+	update_counts = update_times_start;
+	cudaEventCreate( &beginEvent );
+	cudaEventCreate( &endEvent );
+#endif
+
 
     cudaMalloc((void**)&dev_pos, N * sizeof(glm::vec3));
     checkCUDAErrorWithLine("cudaMalloc dev_pos failed!");
@@ -270,14 +293,45 @@ void Nbody::stepSimulation(float dt) {
     // calls the kernels to perform a full simulation step.
 
 	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+
+#ifdef PERFORMANCE_RATE
+	if(update_counts == update_times_start)
+	{
+		cudaEventRecord(beginEvent,0);
+	}
+#endif
+	//cudaEventRecord(beginEvent,0);
 	kernUpdateAcc<<< fullBlocksPerGrid,blockSize >>>(numObjects,dt,dev_pos,dev_acc);
 	kernUpdateVelPos<<< fullBlocksPerGrid,blockSize >>>(numObjects,dt,dev_pos,dev_vel,dev_acc);
+	//cudaEventRecord(endEvent,0);
+	//cudaEventSynchronize( endEvent );
+	//float ms;
+	//cudaEventElapsedTime(&ms,beginEvent,endEvent);
+	//printf("%f\n",ms);
+
+#ifdef PERFORMANCE_RATE
+	update_counts ++ ;
+	if(update_counts == update_times_end)
+	{
+		cudaEventRecord(endEvent,0);
+		cudaEventSynchronize( endEvent );
+		float ms;
+		cudaEventElapsedTime(&ms,beginEvent,endEvent);
+		printf("updates:%d \nblocksize:%d \ntime:%f\n",update_times_end-update_times_start,blockSize,ms);
+
+	}
+#endif
 }
 
 
 
 void Nbody::endSimulation()
 {
+#ifdef PERFORMANCE_RATE
+	cudaEventDestroy( beginEvent );
+	cudaEventDestroy( endEvent );
+#endif
+
 	cudaFree(dev_acc);
 	cudaFree(dev_vel);
 	cudaFree(dev_pos);

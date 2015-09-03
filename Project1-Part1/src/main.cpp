@@ -13,6 +13,7 @@
 // ================
 
 #define VISUALIZE 1
+//#define VISUALIZE 0
 
 const int N_FOR_VIS = 5000;
 const float DT = 0.2f;
