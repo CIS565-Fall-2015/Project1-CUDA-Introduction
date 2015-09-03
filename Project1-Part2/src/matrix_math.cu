@@ -51,7 +51,7 @@ float *dev_mat_c;
 
 void MatrixMath::initialization(int mat_width) {
 	hst_width = mat_width;
-	// Set up gird and block dimensions for handling the matrix as a 1D array
+	// Set up grid and block dimensions for handling the matrix as a 1D array
 	block_dim = dim3(mat_width * mat_width);
 	grid_dim = dim3(1, 1);
 
