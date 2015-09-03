@@ -195,7 +195,7 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
 	for (int i = 0; i < N; i++) {
 		if (i != iSelf) {
 			a = single_acc(planetMass, this_planet, other_planets[i]);
-			dir = glm::normalize(this_planet - other_planets[i]);
+			dir = glm::normalize(other_planets[i] - this_planet);
 			acc += a*dir;
 		}
 	}
