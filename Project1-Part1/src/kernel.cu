@@ -178,7 +178,7 @@ __device__ glm::vec3 gravitationalAccelerationHelper(glm::vec3 this_planet, glm:
 	if (glm::abs(distance_squared) < EPSILON) {
 		distance_squared = EPSILON;
 	}
-	glm::vec3 unit_direction = glm::normalize(this_planet - other_body);
+	glm::vec3 unit_direction = glm::normalize(other_body - this_planet);
 	float g = (G * other_body_mass) / distance_squared;
 
 	return g * unit_direction;
