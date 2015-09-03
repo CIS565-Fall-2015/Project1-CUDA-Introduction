@@ -1,5 +1,4 @@
 #define GLM_FORCE_CUDA
-#include <iostream>
 #include <stdio.h>
 #include <cuda.h>
 #include <cmath>
@@ -58,15 +57,15 @@ void MatrixMath::initialization(int mat_width) {
 
 	// Allocate host memory
 	if (*(hst_mat_a = (float*)malloc((mat_width * mat_width) * sizeof(float))) == -1.0f) {
-		fprintf(stdout, "cudaMalloc hst_mat_a failed!\n");
+		fprintf(stdout, "malloc hst_mat_a failed!\n");
 	}
 
 	if (*(hst_mat_b = (float*)malloc((mat_width * mat_width) * sizeof(float))) == -1.0f) {
-		fprintf(stdout, "cudaMalloc hst_mat_b failed!\n");
+		fprintf(stdout, "malloc hst_mat_b failed!\n");
 	}
 
 	if (*(hst_mat_c = (float*)malloc((mat_width * mat_width) * sizeof(float))) == -1.0f) {
-		fprintf(stdout, "cudaMalloc hst_mat_c failed!\n");
+		fprintf(stdout, "malloc hst_mat_c failed!\n");
 	}
 
 	// Allocate device memory
