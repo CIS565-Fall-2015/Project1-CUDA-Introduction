@@ -33,10 +33,10 @@ float *hst_mat_a;
 float *hst_mat_b;
 float *hst_mat_c;
 
+
 /***********************************************
 * Device state *
 ***********************************************/
-
 
 dim3 block_dim;
 dim3 grid_dim;
@@ -47,29 +47,29 @@ float *dev_mat_c;
 
 
 /******************
-* initialization *
+* Initialization and cleanup *
 ******************/
 
 void MatrixMath::initialization(int mat_width) {
 	hst_width = mat_width;
-	// TODO: Not sure on how to set this up, cause we are using a 1D array, not 2D. Think this is valid
+	// Set up gird and block dimensions for handling the matrix as a 1D array
 	block_dim = dim3(mat_width * mat_width);
 	grid_dim = dim3(1, 1);
 
-	// Is it this memory I am going to have to move?
-	// use malloc then move this to the device
-	//what am i initiallizing hte values too here?
-	hst_mat_a = (float*)malloc((mat_width * mat_width) * sizeof(float));
-	// TODO: Error check
+	// Allocate host memory
+	if (*(hst_mat_a = (float*)malloc((mat_width * mat_width) * sizeof(float))) == -1.0f) {
+		fprintf(stdout, "cudaMalloc hst_mat_a failed!\n");
+	}
 
-	hst_mat_b = (float*)malloc((mat_width * mat_width) * sizeof(float));
-	// TODO: Error check
+	if (*(hst_mat_b = (float*)malloc((mat_width * mat_width) * sizeof(float))) == -1.0f) {
+		fprintf(stdout, "cudaMalloc hst_mat_b failed!\n");
+	}
 
-	hst_mat_c = (float*)malloc((mat_width * mat_width) * sizeof(float));
-	// TODO: Error check
+	if (*(hst_mat_c = (float*)malloc((mat_width * mat_width) * sizeof(float))) == -1.0f) {
+		fprintf(stdout, "cudaMalloc hst_mat_c failed!\n");
+	}
 
-	//think I only want to allocate on the device when doing cuda
-
+	// Allocate device memory
 	cudaMalloc((void**)&dev_mat_a, (mat_width * mat_width) * sizeof(float));
 	checkCUDAErrorWithLine("cudaMalloc dev_mat_a failed!");
 
@@ -91,6 +91,11 @@ void MatrixMath::cleanup() {
 	cudaFree(dev_mat_c);
 }
 
+
+/******************
+* Matrix operations *
+******************/
+
 __global__ void kern_mat_add(float *A, float *B, float *C, int width) {
 	int i = threadIdx.x;
 	C[i] = A[i] + B[i];
@@ -102,11 +107,10 @@ __global__ void kern_mat_sub(float *A, float *B, float *C, int width) {
 }
 
 __global__ void kern_mat_mul(float *A, float *B, float *C, int width) {
-	//int i = threadIdx.x;
 	int i = threadIdx.x % width;
 	int j = threadIdx.x / width;
+
 	float Ci = 0.0f;
-	//this is totally wrong?
 	for (int k = 0; k < width; k++) {
 		float Ai = A[j * width + k];
 		float Bi = B[k * width + i];
@@ -117,7 +121,6 @@ __global__ void kern_mat_mul(float *A, float *B, float *C, int width) {
 }
 
 void MatrixMath::mat_add(float *A, float *B, float *C) {
-	// first copy to device memory, then envoke kernel function
 	cudaMemcpy(dev_mat_a, A, (hst_width * hst_width) * sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_mat_b, B, (hst_width * hst_width) * sizeof(float), cudaMemcpyHostToDevice);
 	kern_mat_add<<<grid_dim, block_dim>>>(dev_mat_a, dev_mat_b, dev_mat_c, hst_width);
@@ -138,6 +141,10 @@ void MatrixMath::mat_mul(float *A, float *B, float *C) {
 	cudaMemcpy(C, dev_mat_c, (hst_width * hst_width) * sizeof(float), cudaMemcpyDeviceToHost);
 }
 
+
+/******************
+* Test utilities *
+******************/
 void MatrixMath::print_mat(float *mat, int width) {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < width; j++) {
@@ -147,9 +154,6 @@ void MatrixMath::print_mat(float *mat, int width) {
 	}
 }
 
-/*
-	This is where we will run tests to confirm the functions work
-*/
 void MatrixMath::run_tests() {
 	float A[] = {
 		9.0f, 10.0f, 2.0f, 1.0f, 7.5f,
