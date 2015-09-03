@@ -11,5 +11,7 @@
 * C main function.
 */
 int main(int argc, char* argv[]) {
-	MatrixMath::initialization();
+	MatrixMath::initialization(5);
+
+	MatrixMath::run_tests();
 }
