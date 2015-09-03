@@ -24,8 +24,6 @@ void checkCUDAError(const char *msg, int line = -1) {
 }
 
 
-
-
 /***********************************************
 * Host state *
 ***********************************************/
@@ -140,27 +138,34 @@ void MatrixMath::mat_mul(float *A, float *B, float *C) {
 	cudaMemcpy(C, dev_mat_c, (hst_width * hst_width) * sizeof(float), cudaMemcpyDeviceToHost);
 }
 
+void MatrixMath::print_mat(float *mat, int width) {
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < width; j++) {
+			fprintf(stdout, "%f, ", mat[(i * width) + j]);
+		}
+		fprintf(stdout, "\n");
+	}
+}
+
 /*
 	This is where we will run tests to confirm the functions work
 */
 void MatrixMath::run_tests() {
-	std::cout << "Test" << std::endl;
-
 	float A[] = {
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+		9.0f, 10.0f, 2.0f, 1.0f, 7.5f,
+		2.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+		1.1f, 3.0f, 1.0f, 20.0f, 13.0f,
+		6.6f, 3.0f, 0.0f, 1.0f, 9.0f,
+		2.0f, 4.0f, 8.0f, 4.5f, 0.0f,
 	};
 	hst_mat_a = A;
 
 	float B[] = {
-		2.0f, 2.0f, 2.0f, 2.0f, 2.0f,
-		2.0f, 2.0f, 2.0f, 2.0f, 2.0f,
-		2.0f, 2.0f, 2.0f, 2.0f, 2.0f,
-		2.0f, 2.0f, 2.0f, 2.0f, 2.0f,
-		2.0f, 2.0f, 2.0f, 2.0f, 2.0f,
+		2.0f, 1.0f, 3.0f, 5.0f, 9.0f,
+		0.5f, 0.1f, 19.0f, 2.0f, 12.0f,
+		5.0f, 2.3f, 8.0f, 2.0f, 13.0f,
+		6.0f, 4.5f, 9.0f, 1.0f, 0.75f,
+		11.0f, 11.0f, 7.8f, 22.0f, 1.0f,
 	};
 	hst_mat_b = B;
 
@@ -173,11 +178,33 @@ void MatrixMath::run_tests() {
 	};
 	hst_mat_c = C;
 
-	MatrixMath::mat_mul(A, B, C);
+	fprintf(stdout, "Running matrix addition, subtraction, and multiplcation tests...\n\n");
 
-	for (int i = 0; i < (hst_width * hst_width); i++) {
-		std::cout << C[i];
-	}
+	fprintf(stdout, "Matrix A:\n");
+	MatrixMath::print_mat(A, hst_width);
+
+	fprintf(stdout, "\n\n");
+
+	fprintf(stdout, "Matrix B:\n");
+	MatrixMath::print_mat(B, hst_width);
+
+	fprintf(stdout, "\n\n");
+
+	fprintf(stdout, "Addition Test A + B = \n");
+	MatrixMath::mat_add(A, B, C);
+	MatrixMath::print_mat(C, hst_width);
+
+	fprintf(stdout, "\n\n");
+
+	fprintf(stdout, "Subtraction Test A - B = \n");
+	MatrixMath::mat_sub(A, B, C);
+	MatrixMath::print_mat(C, hst_width);
+
+	fprintf(stdout, "\n\n");
+
+	fprintf(stdout, "Multiplication Test A * B = \n");
+	MatrixMath::mat_mul(A, B, C);
+	MatrixMath::print_mat(C, hst_width);
 
 	cleanup();
 }

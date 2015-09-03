@@ -10,5 +10,6 @@ namespace MatrixMath {
 	void mat_add(float *A, float *B, float *C);
 	void mat_sub(float *A, float *B, float *C);
 	void mat_mul(float *A, float *B, float *C);
+	void print_mat(float *mat, int width);
 	void run_tests();
 }
