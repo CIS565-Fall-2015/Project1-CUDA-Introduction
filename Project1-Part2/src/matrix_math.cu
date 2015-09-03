@@ -104,19 +104,18 @@ __global__ void kern_mat_sub(float *A, float *B, float *C, int width) {
 }
 
 __global__ void kern_mat_mul(float *A, float *B, float *C, int width) {
-	/*
-	int i = threadIdx.x;
-
-	// reset C[i]
-	C[i] = 0.0f;
-	//this is totally wrong
-	for (int k = 0; k < width; ++k) {
-		float Ai = A[i * width + k];
+	//int i = threadIdx.x;
+	int i = threadIdx.x % width;
+	int j = threadIdx.x / width;
+	float Ci = 0.0f;
+	//this is totally wrong?
+	for (int k = 0; k < width; k++) {
+		float Ai = A[j * width + k];
 		float Bi = B[k * width + i];
 
-		C[i] += Ai * Bi;
+		Ci += Ai * Bi;
 	}
-	*/
+	C[j * width + i] = Ci;
 }
 
 void MatrixMath::mat_add(float *A, float *B, float *C) {
@@ -152,7 +151,7 @@ void MatrixMath::run_tests() {
 		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
 	};
 	hst_mat_a = A;
 
@@ -174,7 +173,7 @@ void MatrixMath::run_tests() {
 	};
 	hst_mat_c = C;
 
-	MatrixMath::mat_add(A, B, C);
+	MatrixMath::mat_mul(A, B, C);
 
 	for (int i = 0; i < (hst_width * hst_width); i++) {
 		std::cout << C[i];
