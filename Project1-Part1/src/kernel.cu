@@ -170,6 +170,21 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  ******************/
 
 /**
+* Compute the acceleration on a body at `my_pos` due a single other body
+*/
+__device__ glm::vec3 gravitationalAccelerationHelper(glm::vec3 this_planet, glm::vec3 other_body, float other_body_mass) {
+	// Check our distance squared calculation to protect against dividing by too small a number
+	float distance_squared = glm::pow(glm::distance(this_planet, other_body), 2);
+	if (glm::abs(distance_squared) < EPSILON) {
+		distance_squared = EPSILON;
+	}
+	glm::vec3 unit_direction = glm::normalize(other_body - this_planet);
+	float g = (G * other_body_mass) / distance_squared;
+
+	return g * unit_direction;
+}
+
+/**
  * Compute the acceleration on a body at `my_pos` due to the `N` bodies in the array `other_planets`.
  */
 __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const glm::vec3 *other_planets) {
@@ -189,8 +204,22 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //    * G is the universal gravitational constant (already defined for you)
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
-    
-    return glm::vec3(0.0f);
+	//	  * Also need to multiply the result by the unit vector of r from the other object to this planet
+	//    * And should this be negative? Because this is an attractive force
+
+	glm::vec3 totalAcceleration = glm::vec3(0.0f);
+
+	// Calculate acceleration relative to the start
+	totalAcceleration += gravitationalAccelerationHelper(this_planet, glm::vec3(0.0f), starMass);
+
+	// Calculate acceleration relative to the other planets
+	for (int i = 0; i < N; i++) {
+		if (i != iSelf) {
+			totalAcceleration += gravitationalAccelerationHelper(this_planet, other_planets[i], planetMass);
+		}
+	}
+
+	return totalAcceleration;
 }
 
 /**
@@ -201,6 +230,9 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement updateAccArray.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+	acc[index] = accelerate(N, index, pos[index], pos);
 }
 
 /**
@@ -209,6 +241,10 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement updateVelocityPosition
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+	vel[index] = vel[index] + acc[index] * dt;
+	pos[index] = pos[index] + vel[index] * dt;
 }
 
 /**
@@ -217,6 +253,13 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
+	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+
+	// Update acceleration
+	kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
+
+	// Update velocity and position
+	kernUpdateVelPos<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
 }
 
 void Nbody::endSimulation()
