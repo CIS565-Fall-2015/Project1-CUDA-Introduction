@@ -189,7 +189,7 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
 	float a = 0.0f;
 	glm::vec3 acc = glm::vec3(0.0f);
 	a = single_acc(starMass, this_planet, glm::vec3(0.0f));
-	glm::vec3 dir = glm::normalize(this_planet);
+	glm::vec3 dir = glm::normalize(-this_planet);
 	acc = dir*a;
 
 	for (int i = 0; i < N; i++) {
