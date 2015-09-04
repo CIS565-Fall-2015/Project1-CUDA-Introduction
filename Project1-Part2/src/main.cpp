@@ -10,6 +10,7 @@ int main(int argc, char* argv[]) {
 
 	initialize(width);
 
+	// do the matrix math
 	printf("Matrix multiplication:\n");
 
 	float* dev_C;
