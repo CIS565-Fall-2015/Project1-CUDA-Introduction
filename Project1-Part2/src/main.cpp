@@ -19,6 +19,17 @@ static bool nearlyEqual(float a, float b, float epsilon) {
 }
 
 int main(int argc, char* argv[]) {
+	int device_count = 0;
+	cudaGetDeviceCount(&device_count);
+	int gpuDevice = 0;
+	if (gpuDevice > device_count) {
+		std::cout
+			<< "Error: GPU device number is greater than the number of devices!"
+			<< " Perhaps a CUDA-capable GPU is not installed?"
+			<< std::endl;
+		return false;
+	}
+
 	CUDA_matrix_math::initialize();
 	float *hst_mat_A = (float*)malloc(sizeof(float) * 25);
 	float *hst_mat_B = (float*)malloc(sizeof(float) * 25);
@@ -63,6 +74,7 @@ int main(int argc, char* argv[]) {
 		assert(nearlyEqual(hst_mat_C[i], hst_mul_check[i], EPSILON));
 	}
 
+	CUDA_matrix_math::teardown();
 	free(hst_mat_A);
 	free(hst_mat_B);
 	free(hst_mat_C);

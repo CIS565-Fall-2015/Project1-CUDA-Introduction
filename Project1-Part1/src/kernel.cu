@@ -131,6 +131,14 @@ void Nbody::initSimulation(int N) {
     cudaThreadSynchronize();
 }
 
+/**
+ *Frees stuff so my display driver doesn't break.
+ */
+void Nbody::tearDown() {
+	cudaFree(dev_pos);
+	cudaFree(dev_vel);
+	cudaFree(dev_acc);
+}
 
 /******************
  * copyPlanetsToVBO *
@@ -174,7 +182,7 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  */
 __device__ glm::vec3 single_point_acceleration(glm::vec3 my_pos, glm::vec3 other_pos, float other_mass) {
 	float r = glm::length(other_pos - my_pos);
-	if (r < 0.0000001f) {
+	if (r < 0.00001f) {
 		return glm::vec3(0, 0, 0);
 	}
 	float g = G * other_mass / (r * r);

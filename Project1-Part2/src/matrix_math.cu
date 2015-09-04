@@ -1,15 +1,15 @@
 #include "matrix_math.h"
 
-float *hst_mat_A;
-float *hst_mat_B;
+//float *hst_mat_A;
+//float *hst_mat_B;
 
 float *dev_mat_A;
 float *dev_mat_B;
 float *dev_mat_C;
 
 void CUDA_matrix_math::initialize() {
-	hst_mat_A = (float*) malloc(sizeof(float) * 25);
-	hst_mat_B = (float*) malloc(sizeof(float) * 25);
+	//hst_mat_A = (float*) malloc(sizeof(float) * 25);
+	//hst_mat_B = (float*) malloc(sizeof(float) * 25);
 	
 	cudaMalloc((void**)&dev_mat_A, sizeof(float) * 25);
 	cudaMalloc((void**)&dev_mat_B, sizeof(float) * 25);
@@ -17,8 +17,8 @@ void CUDA_matrix_math::initialize() {
 }
 
 void CUDA_matrix_math::teardown() {
-	free(hst_mat_A);
-	free(hst_mat_B);
+	//free(hst_mat_A);
+	//free(hst_mat_B);
 
 	cudaFree(dev_mat_A);
 	cudaFree(dev_mat_B);
