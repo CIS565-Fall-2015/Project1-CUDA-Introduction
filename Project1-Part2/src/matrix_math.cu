@@ -1,5 +1,10 @@
 #include "matrix_math.hpp"
 
+float* hst_A;
+float* hst_B;
+float* dev_A;
+float* dev_B;
+
 // DEVICE FUNCTIONS
 __global__ void mat_add(float* A, float* B, float* C, int width){
 	int i = threadIdx.x;
@@ -60,23 +65,25 @@ void kern_mat_mul(float* A, float* B, float* C, int width){
 	mat_mul<<<dimGrid, dimBlock>>>(A, B, C, width);
 }
 
-void initialize(){
-	int width = 2;
+void initialize(int width){
+	//int width = 2;
 	int size = width * width * sizeof(float);
 
-	//hst_A = (float*)malloc(size);
-	//hst_B = (float*)malloc(size);
+	hst_A = (float*)malloc(size);
+	hst_B = (float*)malloc(size);
 
-	//hst_mat1 = {0.0f, 1.0f, 2.0f, 3.0f};
-	//hst_mat2 = {3.0f, 2.0f, 1.0f, 0.0f};
+	for (int i=0; i < width*width; i++){
+		hst_A[i] = (float)i;
+		hst_B[i] = (float)(i+1);
+	}
 
-	//cudaMalloc((void**)&dev_mat1, size);
-	//cudaMalloc((void**)&dev_mat2, size);
-	//cudaMemcpy(dev_mat1, hst_mat1, size, cudaMemcpyHostToDevice);
-	//cudaMemcpy(dev_mat2, hst_mat2, size, cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&dev_A, size);
+	cudaMalloc((void**)&dev_B, size);
+	cudaMemcpy(dev_A, hst_A, size, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_B, hst_B, size, cudaMemcpyHostToDevice);
 }
 
 void cleanup(){
-	//cudaFree(dev_mat1);
-	//cudaFree(dev_mat2);
+	cudaFree(dev_A);
+	cudaFree(dev_B);
 }
