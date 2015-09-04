@@ -224,8 +224,9 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // To avoid race conditions, each instance should only write ONE value to `acc`!
 
 	int i = threadIdx.x + (blockIdx.x * blockDim.x);
-	acc[i] = accelerate(N, i, pos[i], pos);
-
+	if (i < N) {
+		acc[i] = accelerate(N, i, pos[i], pos);
+	}
 }
 
 /**
@@ -236,9 +237,10 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
     // TODO: implement updateVelocityPosition
 
 	int i = threadIdx.x + (blockIdx.x * blockDim.x);
-	vel[i] += acc[i]*dt;
-	pos[i] += vel[i]*dt;
-
+	if (i < N) {
+		vel[i] += acc[i]*dt;
+		pos[i] += vel[i]*dt;
+	}
 }
 
 /**
