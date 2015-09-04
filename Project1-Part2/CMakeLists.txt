@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(cis565_nbody)
+project(cis565_hw1_matrices)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
