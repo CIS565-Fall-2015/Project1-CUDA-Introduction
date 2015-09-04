@@ -4,20 +4,15 @@ CUDA Introduction
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 1**
 
 * Levi Cai
-* Tested on: Windows 7, i7-2222 @ 2.22GHz 22GB, GTX 222 222MB (Moore 100C Lab)
+* Tested on: Windows 7, i7 @ 3.4GHz 16GB, Nvidia NVS 310 (Moore 100C Lab)
 
-
-Include screenshots, analysis, etc. (Remember, this is public, so don't put
-anything here that you don't want to share with the world.)
+Nbody:
+![](images/project1_basic.PNG)
+![](images/project1_few_more_steps.PNG)
 
 ## Performance Analysis
-
-REMEMBER:
-* Performance should always be measured relative to some baseline when
-  possible. A GPU can make your program faster - but by how much?
-* If a change impacts performance, show a comparison. Describe your changes.
-* Describe the methodology you are using to benchmark.
-* Performance plots are a good thing.
+![](images/project1_fps_N.png)
+![](images/project1_fps_threads.png)
 
 ### Questions
 
