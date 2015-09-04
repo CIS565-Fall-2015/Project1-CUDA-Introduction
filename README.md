@@ -10,6 +10,9 @@ Nbody:
 ![](images/project1_basic.PNG)
 ![](images/project1_few_more_steps.PNG)
 
+Matrix math: (to do add or subtract, change line in main.cpp kern_mat_mul(dev_A, dev_B, dev_C, width) to add or sub)
+![](images/project2_mult.PNG)
+
 ## Performance Analysis
 Number of planets vs. FPS
 ![](images/project1_fps_N.png)
