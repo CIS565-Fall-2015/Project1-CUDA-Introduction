@@ -15,6 +15,7 @@ CUDA Introduction
 **N-Body Performance by Block Size**
 ![](images/N-Body Performance by Block Size.png "N-Body Performance by Block Size")
 **How does changing the tile and block size affect performance?**
+
 In the first graph you see that, despite a slight improvement in the 384 and 512 block size ranges, that performance decreases as we increase the block size. The reason for this, I suspect, is that the blocks and threads are optimally computationally saturated in this area, giving the increased performance. After this point though, the blocks and threads are under saturated, resulting in performance decrease as we add additional overhead in the form of new blocks that the simulation is not taking proper advantage of.
 **N-Body Performance by Planet Size**
 ![](images/N-Body Performance by Planet Size.png "N-Body Performance by Planet Size")
