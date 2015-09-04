@@ -1,5 +1,4 @@
 #include "matrix_math.h"
-#include <iostream>
 
 float *hst_mat_A;
 float *hst_mat_B;
@@ -56,7 +55,6 @@ __global__ void mat_mul(float *A, float *B, float *C) {
 	int corner_index = corner_x + corner_y * 5;
 	int col_index = local_index % 5 + corner_index;
 	int row_index = (local_index / 5) * 5 + corner_index;
-	//printf("%i %i\n", col_index, row_index);
 	for (int i = 0; i < 5; i++) {
 		dot_product += A[row_index] * B[col_index];
 		col_index += 5;
