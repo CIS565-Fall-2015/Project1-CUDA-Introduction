@@ -30,25 +30,4 @@ Number of threads vs. FPS for 1000 planets
   expect the performance to compare? Why? What might be the trade-offs?
   As mentioned previously, parts of the problems that are not parallelized will give similar performance to the CPU version. In terms of the naive matrix math implementations, additions and subtractions are highly parallelizable and so should be quite fast compared to CPU solutions for somewhat large to large problems (where any memory setup tradeoff is overcome). However, for matrix multiplication, there is still coupling when iterating through the rows and columns to get the dot products. This will mean that the runtime will scale linearly with the width of the matrices. The GPU version also has a limitation based on the number of total possible threads in the current implementation since it assumes all dot products must be computed in parallel. In general then, the GPU version should be at least O(N) faster as long as the size of the matrix is constrained. In too large of problems, the need to swap memory constantly, syncronizing, etc...(at least in a naive manner), may cause the performance to be similar to that of a CPU in the multiplication case. 
 
-**NOTE: Nsight performance analysis tools *cannot* presently be used on the lab
-computers, as they require administrative access.** If you do not have access
-to a CUDA-capable computer, the lab computers still allow you to do timing
-mesasurements! However, the tools are very useful for performance debugging.
 
-
-## Submit
-
-If you have modified any of the `CMakeLists.txt` files at all (aside from the
-list of `SOURCE_FILES`), you must test that your project can build in Moore
-100B/C. Beware of any build issues discussed on the Google Group.
-
-1. Open a GitHub pull request so that we can see that you have finished.
-   The title should be "Submission: YOUR NAME".
-2. Send an email to the TA (gmail: kainino1+cis565@) with:
-   * **Subject**: in the form of `[CIS565] Project 0: PENNKEY`
-   * Direct link to your pull request on GitHub
-   * In the form of a grade (0-100+), evaluate your own performance on the
-     project.
-   * Feedback on the project itself, if any.
-
-And you're done!
