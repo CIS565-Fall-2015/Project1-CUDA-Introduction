@@ -32,11 +32,10 @@ float *dev_A;
 float *dev_B;
 float *dev_C;
 
-__global__ void generateRandomMatrix(int time, int arraySize, float * mat) {
-	int i = threadIdx.x;
-	if (i < arraySize) {
+void generateRandomMatrix(int arraySize, float * mat) {
+	for (int i = 0; i < arraySize; i++) {
 
-		mat[i] = 2;
+		mat[i] = rand() % 10 + 1;
 	}
 }
 
@@ -62,9 +61,9 @@ void MatMath::initSimulation(int N) {
 	cudaMalloc((void**)&dev_C, arraySize * sizeof(float));
     checkCUDAErrorWithLine("cudaMalloc dev_C failed!");
 
-    generateRandomMatrix<<<1, arraySize>>>(1, arraySize, hst_A);
+    generateRandomMatrix(arraySize, hst_A);
 
-	generateRandomMatrix<<<1, arraySize>>>(1, arraySize, hst_B);
+	generateRandomMatrix(arraySize, hst_B);
 
     cudaThreadSynchronize();
 }
@@ -129,9 +128,23 @@ void MatMath::mat_mul(float * A, float *B, float * C) {
 	cudaMemcpy(hst_C, dev_C, size, cudaMemcpyDeviceToHost);
 }
 
-void testFunc(int test) {
-	printf((const char*)hst_A);
-	printf((const char*)hst_B);
+void MatMath::testFunc(int test) {
+	int i;
+	for (i=0;i < arraySize;i++) {
+		if (i%width == 0) {
+			printf("\n");
+		}
+		printf("%f ",hst_A[i]);
+		
+	}
+	printf("\n");
+	for (i=0;i < arraySize;i++) {
+		if (i%width == 0) {
+			printf("\n");
+		}
+		printf("%f ",hst_B[i]);
+		
+	}
 	if (test == 0) {
 		MatMath::mat_add(hst_A, hst_B, hst_C);
 	}
@@ -141,5 +154,12 @@ void testFunc(int test) {
 	else if (test == 2) {
 		MatMath::mat_mul(hst_A, hst_B, hst_C);
 	}
-	printf((const char*)hst_C);
+	printf("\n");
+	for (i=0;i < arraySize;i++) {
+		if (i%width == 0) {
+			printf("\n");
+		}
+		printf("%f ",hst_C[i]);
+		
+	}
 }

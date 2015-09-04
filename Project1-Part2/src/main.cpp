@@ -19,7 +19,7 @@ const int N = 5;
 int main(int argc, char* argv[]) {
 	const char *projectName = "565 CUDA Intro: Matrix Math";
 	MatMath::initSimulation(N);
-	MatMath::testFunc(0);
+	MatMath::testFunc(1);
 
 }
 
