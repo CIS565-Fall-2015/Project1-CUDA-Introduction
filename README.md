@@ -8,7 +8,7 @@ CUDA Introduction
 
 **N-Body Performance Analysis**
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/jyhjrrtshVE" frameborder="0" allowfullscreen></iframe>
+https://youtu.be/jyhjrrtshVE
 
 ![](images/N-Body.png "The N-Body Simulation Running")
 ![](images/N-Body Performance by Block Size.png "N-Body Performance by Block Size")
