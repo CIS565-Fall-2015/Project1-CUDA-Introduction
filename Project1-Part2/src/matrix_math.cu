@@ -24,6 +24,18 @@ __global__ void mat_sub(float* A, float* B, float* C, int width){
 }
 
 __global__ void mat_mul(float* A, float* B, float* C, int width){
+	int i = threadIdx.x;
+	int j = threadIdx.y;
+
+	float val = 0;
+	
+	for (int k = 0; k < width; ++k){
+		float Ael = A[k + j*width];
+		float Bel = B[i + k*width];
+		val += Ael * Bel;
+	}
+
+	C[i + j*width] = val;
 }
 
 // KERNEL FUNCTIONS
@@ -38,14 +50,14 @@ void kern_mat_sub(float* A, float* B, float* C, int width){
 	dim3 dimBlock(width, width);
 	dim3 dimGrid(1, 1);
 
-	mat_add<<<dimGrid, dimBlock>>>(A, B, C, width);
+	mat_sub<<<dimGrid, dimBlock>>>(A, B, C, width);
 }
 
 void kern_mat_mul(float* A, float* B, float* C, int width){
 	dim3 dimBlock(width, width);
 	dim3 dimGrid(1, 1);
 
-	mat_add<<<dimGrid, dimBlock>>>(A, B, C, width);
+	mat_mul<<<dimGrid, dimBlock>>>(A, B, C, width);
 }
 
 void initialize(){

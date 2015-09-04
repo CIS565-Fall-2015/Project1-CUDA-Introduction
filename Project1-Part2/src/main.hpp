@@ -22,15 +22,4 @@ const char *projectName;
 
 int main(int argc, char* argv[]);
 
-//====================================
-// Main loop
-//====================================
-void mainLoop();
-void errorCallback(int error, const char *description);
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void runCUDA();
-
-//====================================
-// Setup/init Stuff
-//====================================
-bool init(int argc, char **argv);
+void mat_print(float* mat, int width);
