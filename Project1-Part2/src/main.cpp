@@ -18,6 +18,16 @@ static bool nearlyEqual(float a, float b, float epsilon) {
 	}
 }
 
+static void printMatrix(float *matrix, int dimm) {
+	for (int i = 0; i < dimm; i++) {
+		for (int j = 0; j < dimm; j++) {
+			int index = j + i * dimm;
+			printf("%f ", matrix[index]);
+		}
+		printf("\n");
+	}
+}
+
 int main(int argc, char* argv[]) {
 	int device_count = 0;
 	cudaGetDeviceCount(&device_count);
@@ -59,23 +69,45 @@ int main(int argc, char* argv[]) {
 		1315.0f, 1430.0f, 1545.0f, 1660.0f, 1775.0f
 	};
 
+	printf("Matrix A is \n");
+	printMatrix(hst_mat_A, 5);
+	printf("\n");
+
+	printf("Matrix B is \n");
+	printMatrix(hst_mat_B, 5);
+	printf("\n");
+
 	CUDA_matrix_math::cuda_mat_add(hst_mat_A, hst_mat_B, hst_mat_C);
 	for (int i = 0; i < 25; i++) {
 		assert(nearlyEqual(hst_mat_C[i], hst_add_check[i], EPSILON));
 	}
+
+	printf("After performing addition, C is \n");
+	printMatrix(hst_mat_C, 5);
+	printf("\n");
 
 	CUDA_matrix_math::cuda_mat_sub(hst_mat_A, hst_mat_B, hst_mat_C);
 	for (int i = 0; i < 25; i++) {
 		assert(nearlyEqual(hst_mat_C[i], hst_sub_check[i], EPSILON));
 	}
 
+	printf("After performing subtraction, C is \n");
+	printMatrix(hst_mat_C, 5);
+	printf("\n");
+
 	CUDA_matrix_math::cuda_mat_mul(hst_mat_A, hst_mat_B, hst_mat_C);
 	for (int i = 0; i < 25; i++) {
 		assert(nearlyEqual(hst_mat_C[i], hst_mul_check[i], EPSILON));
 	}
 
+	printf("After performing multiplication, C is \n");
+	printMatrix(hst_mat_C, 5);
+	printf("\n");
+
 	CUDA_matrix_math::teardown();
 	free(hst_mat_A);
 	free(hst_mat_B);
 	free(hst_mat_C);
+
+	system("pause");
 }
