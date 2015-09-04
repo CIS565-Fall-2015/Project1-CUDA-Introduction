@@ -6,20 +6,23 @@ CUDA Introduction
 * Bradley Crusco
 * Tested on: Windows 10, i7-3770K @ 3.50GHz 16GB, 2 x GTX 980 4096MB (Personal Computer)
 
-**N-Body Performance Analysis**
-
-https://youtu.be/jyhjrrtshVE
-
+## N-Body Simulation
 ![](images/N-Body.png "The N-Body Simulation Running")
+[YouTube Video](https://youtu.be/jyhjrrtshVE)
+
+### N-Body Performance Analysis
+
+**N-Body Performance by Block Size**
 ![](images/N-Body Performance by Block Size.png "N-Body Performance by Block Size")
+**N-Body Performance by Planet Size**
 ![](images/N-Body Performance by Planet Size.png "N-Body Performance by Planet Size")
-*How does changing the tile and block size affect performance?*
+**How does changing the tile and block size affect performance?**
 In the first graph you see that, despite a slight improvement in the 384 and 512 block size ranges, that performance decreases as we increase the block size. The reason for this, I suspect, is that the blocks and threads are optimally computationally saturated in this area, giving the increased performance. After this point though, the blocks and threads are under saturated, resulting in performance decrease as we add additional overhead in the form of new blocks that the simulation is not taking proper advantage of.
-*How does changing the number of planets effect performance?*
+**How does changing the number of planets effect performance?**
 As can be seen in the second graph, the average duration of the kernUpdateAcc function increases exponentially as the number of planets increases. This result is with the number of blocks set to the default of 128 given in the starter code as a baseline. The reason for this seems fairly obvious, since the N-body simulation is a O(N^2) problem, and without altering our block size to compensate we should expect to see this growth in execution time.
 
-**Matrix Math**
-
+## Matrix Math
+### Matrix Math Performance Analysis
 ![](images/Matrix Math Block Size Analysis.png "Matrix Math Block Size Analysis")
 *How does changing the tile and block size affect performance?*
 Because the computational requirements are so low with the small matrices we are dealing with, block size does not really matter. In fact, we could reduce the block size to 1 (from 25, as I have it now) and see no noticeable difference, as you see in the graph. For very large matrices however this would not be the case.
