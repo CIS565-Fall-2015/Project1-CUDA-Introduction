@@ -251,6 +251,7 @@ void Nbody::stepSimulation(float dt) {
 	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
 	kernUpdateAcc <<< fullBlocksPerGrid, threadsPerBlock >>>(numObjects, dt, dev_pos, dev_acc);
 	kernUpdateVelPos <<< fullBlocksPerGrid, threadsPerBlock >> > (numObjects, dt, dev_pos, dev_vel, dev_acc);
+	cudaThreadSynchronize();
 }
 
 void Nbody::endSimulation()
