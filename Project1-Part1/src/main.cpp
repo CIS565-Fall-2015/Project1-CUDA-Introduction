@@ -117,12 +117,17 @@ bool init(int argc, char **argv) {
 }
 
 void initVAO() {
-    glm::vec4 vertices[] = {
+	glm::vec4 vertices1(-1.0,-1.0,0.0,0.0);
+	glm::vec4 vertices2(-1.0,1.0,0.0,0.0);
+	glm::vec4 vertices3(1.0,1.0,0.0,0.0);
+	glm::vec4 vertices4(1.0,-1.0,0.0,0.0);
+	glm::vec4 vertices[]={vertices1,vertices2,vertices3,vertices4};
+    /*glm::vec4 vertices[] = {
         { -1.0, -1.0, 0.0, 0.0 },
         { -1.0,  1.0, 0.0, 0.0 },
         {  1.0,  1.0, 0.0, 0.0 },
         {  1.0, -1.0, 0.0, 0.0 },
-    };
+    };*/
     GLuint indices[] = { 0, 1, 2, 1, 2, 3 };
 
     GLfloat *bodies    = new GLfloat[4 * (N_FOR_VIS + 1)];

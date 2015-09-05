@@ -165,6 +165,12 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
 }
 
 
+__device__ glm::vec3 getAcc(glm::vec3 pos1,glm::vec3 pos2,int mass2){
+	glm::vec3 pos=pos2-pos1;
+	float ac=G*mass2/(pow(glm::length(pos),2)+0.1);
+	return glm::normalize(pos)*ac;
+}
+
 /******************
  * stepSimulation *
  ******************/
@@ -189,8 +195,15 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //    * G is the universal gravitational constant (already defined for you)
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
-    
-    return glm::vec3(0.0f);
+    glm::vec3 result=glm::vec3(0,0,0);
+	for(int i=0;i<N;++i){
+		if(i!=iSelf){
+			result+=getAcc(this_planet,other_planets[i],planetMass);
+		}
+	}
+	result+=getAcc(this_planet,glm::vec3(0,0,0),starMass);
+	return result;
+    //return glm::vec3(0.0f);
 }
 
 /**
@@ -201,6 +214,10 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement updateAccArray.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+	int index=blockIdx.x*blockDim.x+threadIdx.x;
+	if(index<N){
+		acc[index]=accelerate(N,index,pos[index],pos);
+	}
 }
 
 /**
@@ -209,6 +226,11 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement updateVelocityPosition
+	int index=blockIdx.x*blockDim.x+threadIdx.x;
+	if(index<N){
+		vel[index]+=acc[index]*dt;
+		pos[index]+=vel[index]*dt;
+	}
 }
 
 /**
@@ -217,4 +239,7 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
+	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+	kernUpdateAcc<<<fullBlocksPerGrid,blockSize>>>(numObjects,dt,dev_pos,dev_acc);
+	kernUpdateVelPos<<<fullBlocksPerGrid,blockSize>>>(numObjects,dt,dev_pos,dev_vel,dev_acc);
 }
