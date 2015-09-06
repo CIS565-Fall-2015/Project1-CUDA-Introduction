@@ -186,6 +186,7 @@ __device__ glm::vec3 single_point_acceleration(glm::vec3 my_pos, glm::vec3 other
 		return glm::vec3(0, 0, 0);
 	}
 	float g = G * other_mass / (r * r);
+	//printf("g is %f and r is %f\n", g, r);
 	return glm::normalize(other_pos - my_pos) * g;
 }
 
@@ -213,8 +214,10 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
 	glm::vec3 contributions = glm::vec3(0, 0, 0);
 	// this isn't ideal. but how to accumulate contributions without a for?
 	// alternative: compute all velocities on threads, but... memory?
+	//printf("%d: doing acceleration for point at %f %f %f\n", iSelf, this_planet[0], this_planet[1], this_planet[2]);
 	for (int i = 0; i < N; i++) {
 		if (i == iSelf) {
+			//printf("%d: don't check self\n", iSelf);
 			continue;
 		}
 		contributions += single_point_acceleration(this_planet, other_planets[i], planetMass);
@@ -232,6 +235,9 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
 	int index = threadIdx.x + (blockIdx.x * blockDim.x);
+	if (index >= N) {
+		return;
+	}
 	acc[index] = accelerate(N, index, pos[index], pos);
 }
 
@@ -242,6 +248,9 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement updateVelocityPosition
 	int index = threadIdx.x + (blockIdx.x * blockDim.x);
+	if (index >= N) {
+		return;
+	}
 	pos[index] += vel[index] * dt + 0.5f * acc[index] * dt * dt;
 	vel[index] += acc[index] * dt;
 }
