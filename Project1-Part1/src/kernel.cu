@@ -156,7 +156,7 @@ __global__ void kernCopyPlanetsToVBO(int N, glm::vec3 *pos, float *vbo, float s_
  * Wrapper for call to the kernCopyPlanetsToVBO CUDA kernel.
  */
 void Nbody::copyPlanetsToVBO(float *vbodptr) {
-    dim3 fullBlocksPerGrid((int)ceil(float(numObjects) / float(blockSize)));
+    dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
 
     kernCopyPlanetsToVBO<<<fullBlocksPerGrid, blockSize>>>(numObjects, dev_pos, vbodptr, scene_scale);
     checkCUDAErrorWithLine("copyPlanetsToVBO failed!");
@@ -169,19 +169,7 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  * stepSimulation *
  ******************/
 
-/**
- * Compute the acceleration on a body at `my_pos` due to the `N` bodies in the array `other_planets`.
- */
-__device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const glm::vec3 *other_planets) {
-    // TODO: Compute the acceleration on `my_pos` due to:
-    //   * The star at the origin (with mass `starMass`)
-    //   * All of the *other* planets (with mass `planetMass`)
-    // Return the sum of all of these contributions.
-
-    // HINT: You may want to write a helper function that will compute the acceleration at
-    //   a single point due to a single other mass. Be careful that you protect against
-    //   division by very small numbers.
-    // HINT: Use Newtonian gravitational acceleration:
+__device__ glm::vec3 accelOne(glm::vec3 planet, glm::vec3 other, float mass) {
     //       G M
     //  g = -----
     //       r^2
@@ -189,8 +177,27 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //    * G is the universal gravitational constant (already defined for you)
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
-    
-    return glm::vec3(0.0f);
+    float num = G * mass;
+    float r = glm::distance(planet, other);
+    float denom = r * r;
+    if (denom > 0.1) {
+        glm::vec3 dir = glm::normalize(other - planet);
+        return 1 * (num / denom) * dir;
+    } else {
+        return glm::vec3(0, 0, 0);
+    }
+}
+
+/**
+ * Compute the acceleration on a body at `my_pos` due to the `N` bodies in the array `other_planets`.
+ */
+__device__ glm::vec3 accelerate(int N, int iSelf, const glm::vec3 *pos) {
+    glm::vec3 planet = pos[iSelf];
+    glm::vec3 totalAccel = accelOne(planet, glm::vec3(0, 0, 0), starMass);
+    for (int i = 0; i < N; i++) {
+        totalAccel += accelOne(planet, pos[i], planetMass);
+    }
+    return totalAccel;
 }
 
 /**
@@ -198,9 +205,11 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
  * Compute the total instantaneous acceleration using `accelerate`, then store that into `acc`.
  */
 __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *acc) {
-    // TODO: implement updateAccArray.
-    // This function body runs once on each CUDA thread.
-    // To avoid race conditions, each instance should only write ONE value to `acc`!
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < N) {
+        acc[i] = accelerate(N, i, pos);
+    } else {
+    }
 }
 
 /**
@@ -208,19 +217,28 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  * simple Euler integration scheme. Acceleration must be updated before calling this kernel.
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
-    // TODO: implement updateVelocityPosition
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < N) {
+        vel[i] += acc[i] * dt;
+        pos[i] += vel[i] * dt;
+    }
 }
 
 /**
  * Step the entire N-body simulation by `dt` seconds.
  */
 void Nbody::stepSimulation(float dt) {
-    // TODO: Using the CUDA kernels you wrote above, write a function that
-    // calls the kernels to perform a full simulation step.
+    dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+    kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt,
+            dev_pos, dev_acc);
+    checkCUDAErrorWithLine("kernUpdateAcc failed!");
+
+    kernUpdateVelPos<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt,
+            dev_pos, dev_vel, dev_acc);
+    checkCUDAErrorWithLine("kernUpdateVelPos failed!");
 }
 
-void Nbody::endSimulation()
-{
+void Nbody::endSimulation() {
     cudaFree(dev_acc);
     cudaFree(dev_vel);
     cudaFree(dev_pos);
