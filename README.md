@@ -13,9 +13,15 @@ CUDA Introduction
 
 ## Performance Analysis
 #### Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?
-* Part 1:
-* Part 2:
-* 
+* Part 1: Changing block sizes (listed below) affects fps performance. However the impact is very little. The grid size is automatically calculated on 5000 planets, hence 40 blocks for block size 128. The minor one from block size 64 to 128 might be due to an increased size in shared memory, and a reduced overhead of block scheduling. After that, utilization of GPU cores might drop down, and each used core has more workload, hence the slight performance drop.
+   * 64: 20 fps
+   * 128: 22 fps
+   * 256: 21.5 fps
+   * 512: 20.5 fps
+* Part 2: Changing block sizes do have a noticeable impact on the performance, in term of execution time. Operations are tested using two matrices `I` and `2I`. For matrix addition and subtraction, more blocks with a smaller block size runs faster, and there is no significant different for multiplication. The performance improvement is due to utilizing spare GPU cores for more parallelized computation. The even performance for multiplication is probably due to that memory access overhead has evened out the multi-core improvement.
+   * 1 Block, 5x5 Thread: Add: 0.006976, Sub: 0.004736, Mul: 0.007200
+	* 5 Block, 5x1 Thread: Add: 0.004704, Sub: 0.004672, Mul: 0.007264 
+
 #### How does changing the number of planets affect performance? Why?
 Varying the number of planets can significantly impact the performace in terms of frame rate. With block size of 128, and grid size automatically calculated based on number of planets, 5000 planets yields 22 fps, while 500 planet, which is 1/10 of the original size, yields 300 fps. Further reducing planet population to 50 yields a fps of 400.
 
@@ -27,21 +33,3 @@ Reducing workload immediately yields a big improvement in performance. However t
 I expect GPU code to run much faster in term of execution time. CPU code would need a sequential nested loop that cannot be carried out very well in parallel. This nested loop would have an complexity of n^3, for a square n by n matrix. Meanwhile GPU code can utilize the parallelism, where each thread runs in O(n). If we consider the scheduling overhead to be neglegible, then GPU code will be significantly faster due to this complexity difference.
 
 CPU may have a faster memory access, and GPU doesn't. Therefore the actual performance difference might not be that significant, due to overhead caused by excessive memory access from GPU code. Therefore the trade-off will be that to sacrifice I/O time for faster arithmetic operations.
-
-
-## Submit
-
-If you have modified any of the `CMakeLists.txt` files at all (aside from the
-list of `SOURCE_FILES`), you must test that your project can build in Moore
-100B/C. Beware of any build issues discussed on the Google Group.
-
-1. Open a GitHub pull request so that we can see that you have finished.
-   The title should be "Submission: YOUR NAME".
-2. Send an email to the TA (gmail: kainino1+cis565@) with:
-   * **Subject**: in the form of `[CIS565] Project 0: PENNKEY`
-   * Direct link to your pull request on GitHub
-   * In the form of a grade (0-100+), evaluate your own performance on the
-     project.
-   * Feedback on the project itself, if any.
-
-And you're done!
