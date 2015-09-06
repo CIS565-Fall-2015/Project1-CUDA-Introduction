@@ -29,6 +29,13 @@ void checkCUDAError(const char *msg, int line = -1) {
 
 /*! Block size used for CUDA kernel launch. */
 #define blockSize 128
+/*
+fps
+64: 20
+128: 22
+256: 21.5
+512: 20.5
+*/
 
 /*! Mass of one "planet." */
 #define planetMass 3e8f
