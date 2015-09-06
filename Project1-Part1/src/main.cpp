@@ -14,7 +14,7 @@
 
 #define VISUALIZE 1
 
-const int N_FOR_VIS = 2000;
+const int N_FOR_VIS = 10000;
 const float DT = 0.2f;
 
 /**
@@ -238,9 +238,9 @@ void mainLoop() {
 
         glUseProgram(0);
         glBindVertexArray(0);
-#endif
 
         glfwSwapBuffers(window);
+#endif
     }
     glfwDestroyWindow(window);
     glfwTerminate();

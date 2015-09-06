@@ -3,6 +3,7 @@
 #include <cuda.h>
 #include <cmath>
 #include <glm/glm.hpp>
+#include <cuda_runtime.h>
 #include "utilityCore.hpp"
 #include "kernel.h"
 
@@ -28,17 +29,18 @@ void checkCUDAError(const char *msg, int line = -1) {
  *****************/
 
 /*! Block size used for CUDA kernel launch. */
-#define blockSize 128
+#define blockSize 1024
 
 /*! Mass of one "planet." */
 #define planetMass 3e8f
 
 /*! Mass of the "star" at the center. */
-#define starMass 500e10f
+#define starMass 5e10f
 
 /*! Size of the starting area in simulation space. */
 const float scene_scale = 1e2;
 
+const int ApprStep = 1;
 
 /***********************************************
  * Kernel state (pointers are device pointers) *
@@ -177,7 +179,7 @@ __device__ glm::vec3 accBySingleOtherPlanet(glm::vec3 this_planet,glm::vec3 othe
 {
 	float dist = glm::length(other_planet - this_planet);
 	dist *= dist;
-	float gMag = G*mass / (dist + EPSILON);//!!! divide by zero
+	float gMag = G*mass / (dist + ZERO_ABSORPTION_EPSILON);//!!! divide by zero
 	glm::vec3 g = glm::normalize(other_planet - this_planet)*gMag;
 	return g;
 }
@@ -203,7 +205,8 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
 	//g by Origin Star
 	g += accBySingleOtherPlanet(this_planet,glm::vec3(0.0f),starMass);
 	//g by others
-	for (int i = 0; i < N; i++)
+	
+	for (int i = 0; i < N; i += ApprStep)
 	{
 		if (i != iSelf) 
 		{
@@ -249,9 +252,27 @@ void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
 	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+
+	cudaEvent_t start, stop;
+	float elapsedTime;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	cudaEventRecord(start,0);
+	
 	kernUpdateAcc <<< fullBlocksPerGrid, threadsPerBlock >>>(numObjects, dt, dev_pos, dev_acc);
+	
+	cudaEventRecord(stop,0);
+	cudaEventSynchronize(stop);
+	cudaEventElapsedTime(&elapsedTime, start, stop);
+	printf( "\n1 -- kernUpdateAcc Time = %.2fms",elapsedTime );
+
+
+	cudaEventRecord(start, 0);
 	kernUpdateVelPos <<< fullBlocksPerGrid, threadsPerBlock >> > (numObjects, dt, dev_pos, dev_vel, dev_acc);
-	cudaThreadSynchronize();
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+	cudaEventElapsedTime(&elapsedTime, start, stop);
+	printf("\n2 -- kernUpdateVelPos Time = %.4fms", elapsedTime);
 }
 
 void Nbody::endSimulation()

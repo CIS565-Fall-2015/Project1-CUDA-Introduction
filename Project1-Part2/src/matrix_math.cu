@@ -45,7 +45,6 @@ void MatrixCalc::initMats(float *hst_matA,float *hst_matB,int matWidth)
 
 	cudaMalloc((void**)&dev_matC, size);
 	checkCUDAErrorWithLine("cudaMalloc dev_matB failed!");
-	//TODO later: try seperate malloc and memcpy
 
 }
 
@@ -104,9 +103,10 @@ __global__ void kernMatMul(float *matA, float *matB, float *matC, int width)
 
 void MatrixCalc::mat_mul(float*A, float*B, float*C, int width)
 {
-	initMats(A, B, width);//todo later: 5
+	initMats(A, B, width);
 	dim3 threadsPerBlock(width, width);
 	kernMatMul <<<1, threadsPerBlock >>>(dev_matA, dev_matB, dev_matC, width);
+	//kernMatMul << <5, 5 >> >(dev_matA, dev_matB, dev_matC, width);
 	cudaMemcpy(C, dev_matC, width*width*sizeof(float), cudaMemcpyDeviceToHost);
 	freeMats();
 }
