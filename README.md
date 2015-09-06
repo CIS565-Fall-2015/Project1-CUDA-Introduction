@@ -11,7 +11,7 @@ Part 1 - N-body Simulation
 
 #### Screenshots : 
 N = 5000
-![](images/screenshot_N5000.png)
+![](images/screenshot_N5000.PNG)
 
 #### Analysis :
 (1) Number of Planets
@@ -52,18 +52,19 @@ This result shows that the N-body attraction force calculation takes the most am
 	N = 10000, BlockSize = 1024,  GridSize = 10,  kernUpdateAcc 51.6ms ,  16.6fps
 
 N = 5000, BlockSize = 128, GridSize = 40
-![](images/analysis_timeline.png)
-![](images/analysis_cpugpu.png)
+![](images/analysis_timeline.PNG)
+![](images/analysis_cpugpu.PNG)
 
 #### Other :
- - CMakeList modification:
+	CMakeList modification: removed "list(APPEND CUDA_NVCC_FLAGS -G -g)"
+
 
  Part 2 - Matrix Math
 --------------------------
 (1) Tile and block sizes
 Changing the block size and grid size leads to modification for the calculating code for multiplication. But there's no need to change add and sub codes.
-When BlockSize = 25, GridSize = 1, MatC[tx*5+ty] += matA[tx*width + i] * matB[i*width + ty];
-When BlockSize = 5,  GridSize = 5, MatC[(blockIdx.x * blockDim.x) + threadIdx.x] += matA[bx*width + i] * matB[i*width + tx];
-
+	When BlockSize = 25, GridSize = 1, MatC[tx*5+ty] += matA[tx*width + i] * matB[i*width + ty];
+	When BlockSize = 5,  GridSize = 5, MatC[(blockIdx.x * blockDim.x) + threadIdx.x] += matA[bx*width + i] * matB[i*width + tx];
 (2) Expected performance comparison with CPU
-![](images/Part2_analysis.png)
+![](images/Part2_analysis.PNG)
+Compared to the time spent on CudaMelloc and CudaMemcpy, the time spent on kernel computation is relatively very short. Thus, when the size of the matrix is small, the advantages of using GPU is not very obvious.
