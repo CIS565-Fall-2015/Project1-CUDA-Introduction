@@ -22,7 +22,6 @@ void checkCUDAError(const char *msg, int line = -1) {
     }
 }
 
-
 /*****************
  * Configuration *
  *****************/
@@ -169,6 +168,21 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  * stepSimulation *
  ******************/
 
+/*! Mass of one "planet." */
+#define gConstant 6.673e-11
+
+__device__  float computeGravityForce(const glm::vec3 this_obj_pos, const glm::vec3 other_obj_pos,
+		const float other_obj_mass){
+
+	float distance = glm::distance(this_obj_pos, other_obj_pos);
+	distance *= distance;
+
+	if(distance < 1e-5) return 0;
+
+	float numerator =  G * other_obj_mass;
+	return numerator / distance;
+};
+
 /**
  * Compute the acceleration on a body at `my_pos` due to the `N` bodies in the array `other_planets`.
  */
@@ -189,8 +203,22 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //    * G is the universal gravitational constant (already defined for you)
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
-    
-    return glm::vec3(0.0f);
+
+	glm::vec3 gForce(0.0);
+
+	for(int i = 0; i < N; i++) {
+		if(i != iSelf) {
+			glm::vec3 direction =  glm::normalize(other_planets[i] - this_planet);
+			float force = computeGravityForce(this_planet, other_planets[i], planetMass);
+			gForce += direction * force;
+		}
+	}
+
+	glm::vec3 directionToStar =  glm::normalize(glm::vec3(0.0) - this_planet);
+	float force = computeGravityForce(this_planet, glm::vec3(0.0), starMass);
+	gForce += directionToStar * force;
+
+    return gForce;
 }
 
 /**
@@ -201,6 +229,10 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement updateAccArray.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+
+	int i = threadIdx.x + blockDim.x * blockIdx.x;
+	if(i < N)
+		acc[i] = accelerate(N, i, pos[i], pos);
 }
 
 /**
@@ -209,6 +241,12 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement updateVelocityPosition
+
+	int i = threadIdx.x + blockDim.x * blockIdx.x;
+	if(i < N) {
+		vel[i] += acc[i] * dt;
+		pos[i] += vel[i] * dt;
+	}
 }
 
 /**
@@ -217,6 +255,10 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
+
+    dim3 fullBlocksPerGrid((int)ceil(float(numObjects) / float(blockSize)));
+	kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
+	kernUpdateVelPos<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
 }
 
 void Nbody::endSimulation()

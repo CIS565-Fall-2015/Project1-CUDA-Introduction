@@ -40,8 +40,6 @@ set(CORELIBS
 # Enable C++11 for host code
 set(CMAKE_CXX_STANDARD 11)
 
-list(APPEND CUDA_NVCC_FLAGS -G -g)
-
 # OSX-specific hacks/fixes
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     list(APPEND CORELIBS "-framework IOKit")

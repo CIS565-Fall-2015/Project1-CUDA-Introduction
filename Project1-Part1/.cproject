@@ -191,6 +191,9 @@
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/Project1-Part1"/>
 		</configuration>
+		<configuration configurationName="Release"/>
+		<configuration configurationName="RelWithDebugInfo"/>
+		<configuration configurationName="MinSizeRel"/>
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/Project1-Part1"/>
 		</configuration>
