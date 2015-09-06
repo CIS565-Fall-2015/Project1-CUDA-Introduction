@@ -3,6 +3,7 @@
 #include <cuda.h>
 #include <malloc.h>
 #include <cuda_runtime.h>
+#include <iostream>
 
 namespace CUDA_matrix_math {
 	void initialize();

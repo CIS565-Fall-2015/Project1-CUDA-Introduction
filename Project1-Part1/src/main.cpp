@@ -237,9 +237,9 @@ void mainLoop() {
 
         glUseProgram(0);
         glBindVertexArray(0);
-#endif
 
         glfwSwapBuffers(window);
+#endif
     }
     glfwDestroyWindow(window);
     glfwTerminate();
