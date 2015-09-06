@@ -44,12 +44,15 @@ Below is a test when no matter how many total bodies are, when calculating attra
 This result shows that the N-body attraction force calculation takes the most amount of computation time, thus, approximate the attractions of other bodies by calculationg only a portion of N-boies can be a start to accelerate the programm.
 
 (2) Tile and block sizes
+
     N = 10000, BlockSize = 32,    GridSize = 313, kernUpdateAcc 51.9ms ,  16.6fps 
     N = 10000, BlockSize = 64,    GridSize = 157, kernUpdateAcc 51.09ms,  16.7fps
     N = 10000, BlockSize = 128,   GridSize = 79,  kernUpdateAcc 51.12ms,  16.6fps
     N = 10000, BlockSize = 256,   GridSize = 40,  kernUpdateAcc 51.3ms ,  16.7fps
     N = 10000, BlockSize = 512,   GridSize = 20,  kernUpdateAcc 51.6ms ,  16.6fps
     N = 10000, BlockSize = 1024,  GridSize = 10,  kernUpdateAcc 51.6ms ,  16.6fps
+
+	Though there's no significant difference in changing blocksizes and gridsizes, we can still see that the program gets a slight better performance when the block size is 64. As far as I understand now, more blocks offers a higher flexibility and more threads allows them to use a shared memory.
 
 N = 5000, BlockSize = 128, GridSize = 40
 ![](images/analysis_timeline.PNG)
@@ -63,6 +66,7 @@ N = 5000, BlockSize = 128, GridSize = 40
 --------------------------
 (1) Tile and block sizes
 Changing the block size and grid size leads to modification for the calculating code for multiplication. But there's no need to change add and sub codes.
+
     When BlockSize = 25, GridSize = 1, MatC[tx*5+ty] += matA[tx*width + i] * matB[i*width + ty];
     When BlockSize = 5,  GridSize = 5, MatC[(blockIdx.x * blockDim.x) + threadIdx.x] += matA[bx*width + i] * matB[i*width + tx];
 
