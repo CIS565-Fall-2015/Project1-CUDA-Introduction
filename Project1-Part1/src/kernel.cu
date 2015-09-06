@@ -170,6 +170,17 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  ******************/
 
 /**
+Single pair acceleration
+*/
+__device__ glm::vec3 pairAcc(int N, int i, int iSelf, const glm::vec3 *pos){
+	glm::vec3 R = glm::vec3(pos[i].x - pos[iSelf].x, pos[i].y - pos[iSelf].y, pos[i].z - pos[iSelf].z);
+	float r = glm::length(R) + EPSILON;
+	float g = G * planetMass / (r*r);
+	glm::vec3 M = g*(R/r);
+	return M;
+}
+
+/**
  * Compute the acceleration on the body with index `iSelf` due to the `N`
  * bodies in the array `pos`.
  */
@@ -190,8 +201,20 @@ __device__ glm::vec3 accelerate(int N, int iSelf, const glm::vec3 *pos) {
     //    * G is the universal gravitational constant (already defined for you)
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
+	
+	// Origin
+	glm::vec3 R = glm::vec3(-pos[iSelf].x, -pos[iSelf].y, -pos[iSelf].z);
+	float r = glm::length(R) + EPSILON;
+	float g = G * starMass / (r*r);
+	glm::vec3 M = g*(R/r);
 
-    return glm::vec3(0.0f);
+	// Other body
+	for (int i = 0; i < N; i++){
+		M = M + pairAcc(N, i, iSelf, pos);
+	}
+	M = M - pairAcc(N, iSelf, iSelf, pos);
+
+    return M;
 }
 
 /**
@@ -202,6 +225,8 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement kernUpdateAcc.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+	int i = (blockIdx.x*blockDim.x + threadIdx.x) % N;
+	acc[i] = accelerate(N, i, pos);
 }
 
 /**
@@ -210,6 +235,9 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement kernUpdateVelPos.
+	int i = (blockIdx.x*blockDim.x + threadIdx.x) % N;
+	vel[i] = vel[i] + acc[i] * dt;
+	pos[i] = pos[i] + vel[i] * dt;
 }
 
 /**
@@ -218,6 +246,10 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
+	int N = numObjects;
+	int gridSize = (N + blockSize - 1) / blockSize;
+	kernUpdateAcc<<<gridSize, blockSize>>>(N, dt, dev_pos, dev_acc);
+	kernUpdateVelPos<<<gridSize, blockSize>>>(N, dt, dev_pos, dev_vel, dev_acc);
 }
 
 void Nbody::endSimulation() {
