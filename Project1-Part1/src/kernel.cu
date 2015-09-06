@@ -266,11 +266,13 @@ void Nbody::stepSimulation(float dt) {
     // calls the kernels to perform a full simulation step.
 	dim3 fullBlocksPerGrid((int)ceil(float(numObjects) / float(blockSize)));
 	
+	kernUpdateVelPos << <fullBlocksPerGrid, blockSize >> >(numObjects, dt, dev_pos, dev_vel, dev_acc);
+	checkCUDAErrorWithLine("UpdateVelPos failed!");
+	
 	kernUpdateAcc << <fullBlocksPerGrid, blockSize >> >(numObjects, dt, dev_pos, dev_acc);
 	checkCUDAErrorWithLine("UpdateAcc failed!");
 	
-	kernUpdateVelPos << <fullBlocksPerGrid, blockSize >> >(numObjects, dt, dev_pos, dev_vel, dev_acc);
-	checkCUDAErrorWithLine("UpdateVelPos failed!");
+	
 
 	cudaThreadSynchronize();
 }
