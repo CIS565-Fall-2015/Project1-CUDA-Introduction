@@ -28,7 +28,7 @@ void checkCUDAError(const char *msg, int line = -1) {
  *****************/
 
 /*! Block size used for CUDA kernel launch. */
-#define blockSize 128
+#define blockSize 512
 
 /*! Mass of one "planet." */
 #define planetMass 3e8f
@@ -189,8 +189,29 @@ __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const 
     //    * G is the universal gravitational constant (already defined for you)
     //    * M is the mass of the other object
     //    * r is the distance between this object and the other object
-    
-    return glm::vec3(0.0f);
+	glm::vec3 Gravity = glm::vec3(0, 0, 0);
+
+	for(int i=0; i<N; i++){
+		if(i != iSelf){
+			float r = glm::length(other_planets[i]-this_planet);
+			float k = G * planetMass /( r*r + EPSILON );
+			//float k = 0.1;
+			glm::vec3 D = glm::normalize(other_planets[i]-this_planet);
+			Gravity.x = Gravity.x + k*D.x;
+			Gravity.y = Gravity.y + k*D.y;
+			Gravity.z = Gravity.z + k*D.z;
+		}
+	}
+	float r = glm::length(this_planet) ;
+	float k = G * starMass / (r * r + EPSILON);
+	//float k = 0;
+	glm::vec3 D = glm::normalize(-this_planet);
+	Gravity.x = Gravity.x + k*D.x;
+	Gravity.y = Gravity.y + k*D.y;
+	Gravity.z = Gravity.z + k*D.z;
+
+    //return glm::vec3(0.0f);
+	return Gravity;
 }
 
 /**
@@ -201,6 +222,11 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement updateAccArray.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+	if (index < N) {
+		acc[index] = accelerate(N, index, pos[index], pos);
+	}
 }
 
 /**
@@ -209,6 +235,12 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement updateVelocityPosition
+	int index = (blockIdx.x * blockDim.x) + threadIdx.x;
+
+	if (index < N) {
+		vel[index] = vel[index] + acc[index]*dt;
+		pos[index] = pos[index] + vel[index]*dt;
+	}
 }
 
 /**
@@ -217,4 +249,8 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
+	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+
+	kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
+	kernUpdateVelPos<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
 }
