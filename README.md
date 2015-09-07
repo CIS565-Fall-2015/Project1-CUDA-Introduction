@@ -41,7 +41,8 @@ have administrative access to any CUDA-capable machine, please email the TA.
 
 See Project 0, Parts 1-3 for reference.
 
-If you are using Nsight and started Project 0 early, note that things have
+If you are using the Nsight IDE (not Visual Studio) and started Project 0
+early, note that things have
 changed slightly. Instead of creating a new project, use
 *File->Import->General->Existing Projects Into Workspace*, and select the
 `Project1-Part1` folder as the root directory. Under *Project->Build
@@ -69,7 +70,7 @@ The following source files are included in the project:
   kernel invocations.
 
 1. Search the code for `TODO`:
-   * `src/kernel.cu`: Use what you learned in the first lecture to
+   * `src/kernel.cu`: Use what you learned in the first lectures to
      figure out how to resolve these 4 TODOs.
 
 Take a screenshot. Commit and push your code changes.
@@ -111,7 +112,8 @@ accessible by the GPU.
 In order to allocate memory on the GPU, we need to use the CUDA library
 function `cudaMalloc`. This reserves a portion of the GPU memory and returns a
 pointer, like standard `malloc` - but the pointer returned by `cudaMalloc` is
-in the GPU memory space and is only accessible from GPU code.
+in the GPU memory space and is only accessible from GPU code. You can use
+`cudaFree` to free GPU memory allocated using `cudaMalloc`.
 
 We can copy memory to and from the GPU using `cudaMemcpy`. Like C `memcpy`,
 you will need to specify the size of memory that you are copying. But
@@ -119,18 +121,18 @@ you will need to specify the size of memory that you are copying. But
 whether the copy is from host to device, device to host, device to device, or
 host to host.
 
-* Look up documentation on `cudaMalloc` and `cudaMemcpy` if you need to find
+* Look up documentation on `cudaMalloc`, 'cudaFree', and `cudaMemcpy` to find
   out how to use them - they're not quite obvious.
 
-In an initialization function in `matrix_math.cu`, initialize two 5x5 matrices
-on the host and two on the device. Prefix your variables with `hst_` and
+In an initialization function in `matrix_math.cu`, initialize three 5x5 matrices
+on the host and three on the device. Prefix your variables with `hst_` and
 `dev_`, respectively, so you know what kind of pointers they are!
 These arrays can each be represented as a 1D array of floats:
 
 `{ A_00, A_01, A_02, A_03, A_04, A_10, A_11, A_12, ... }`
 
-Don't forget to call your initialization function from your `main` function in
-`main.cpp`.
+You should also create cleanup method(s) to free the CPU and GPU memory you
+allocated. Don't forget to initialize and cleanup in main!
 
 ### 1.3. Creating CUDA Kernels
 
@@ -151,7 +153,7 @@ Tips:
   exist in the right memory space. If you need to move data, you can use
   `cudaMemcpy`.
 * The triple angle brackets `<<< >>>` provide parameters to the CUDA kernel
-  invocation: tile size, block size, and threads per warp.
+  invocation: `<<<blocks_per_tile, threads_per_block, ...>>>`.
 * Don't worry if your IDE doesn't understand some CUDA syntax (e.g.
   `__device__` or `<<< >>>`). By default, it may not understand CUDA
   extensions.
@@ -177,6 +179,18 @@ REMEMBER:
 * Performance plots are a good thing.
 
 ### Questions
+
+For Part 1, there are two ways to measure performance:
+* Disable visualization so that the framerate reported will be for the the
+  simulation only, and not be limited to 60 fps. This way, the framerate
+  reported in the window title will be useful.
+  * Change `#define VISUALIZE` to `0`.
+* For tighter timing measurement, you can use CUDA events to measure just the
+  simulation CUDA kernel. Info on this can be found online easily. You will
+  probably have to average over several simulation steps, similar to the way
+  FPS is currently calculated.
+
+**Answer these:**
 
 * Parts 1 & 2: How does changing the tile and block sizes affect performance?
   Why?

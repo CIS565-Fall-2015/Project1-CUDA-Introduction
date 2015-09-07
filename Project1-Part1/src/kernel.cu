@@ -169,14 +169,8 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  * stepSimulation *
  ******************/
 
-__device__ glm::vec3 accelOne(glm::vec3 planet, glm::vec3 other, float mass) {
-    //       G M
-    //  g = -----
-    //       r^2
-    //  where:
-    //    * G is the universal gravitational constant (already defined for you)
-    //    * M is the mass of the other object
-    //    * r is the distance between this object and the other object
+__device__ glm::vec3 accelOne(glm::vec3 planet, glm::vec3 other, float mass)
+        {
     float num = G * mass;
     float r = glm::distance(planet, other);
     float denom = r * r;
