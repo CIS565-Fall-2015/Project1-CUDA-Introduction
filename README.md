@@ -10,9 +10,13 @@ Changing tile sizes does have a minor impact on the performance, in light of exe
 
 Attached is my part-2 test result:
 (1, 1) Block, (6, 6) Thread: Add -- 0.007168, Sub -- 0.007136, Mul -- 0.008192
+
 (1, 3) Block, (2, 6) Thread: Add -- 0.008192, Sub -- 0.007168, Mul -- 0.008192
+
 (1, 6) Block, (6, 1) Thread: Add -- 0.007200, Sub -- 0.007168, Mul -- 0.007168
+
 (3, 6) Block, (2, 1) Thread: Add -- 0.008192, Sub -- 0.008160, Mul -- 0.008192
+
 (6, 6) Block, (1, 1) Thread: Add -- 0.008192, Sub -- 0.008224, Mul -- 0.008192
 
 
