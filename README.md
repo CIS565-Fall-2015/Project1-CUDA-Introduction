@@ -6,14 +6,14 @@ CUDA Introduction
 * Ratchpak (Dome) Pongmongkol
 * Tested on: OSX Yosemite 10.10.5, i7 @ 2.4GHz 16GB, GT 650M 1024MB (rMBP Early 2013)
 
-###  N-body Simulation: Screenshot 
+#  N-body Simulation: Screenshot 
 
 ![](images/SG.png)
 
-### Performance Analysis
+## Performance Analysis
 
 ## Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?
-#Part 1:
+### Part 1:
 N = 10000
 
 block size				 	  32		 64		   96	    128		  256
@@ -28,7 +28,7 @@ kernUpdateVelPos(ms) 	  0.0356 	 0.0303    0.0290    0.0297    0.0298
 
 My assumption : When the block size is small, the tile size increases. One reason I could think of is that the number of concurrent block is limited (resulting in some block having to wait in the queue). This 'delay' disappears when the tile size decreases to the point that or all threads can run concurrently, so the performance after block size = 128 remains the same. It is also possible that this might be caused by block-switching overhead.
 
-# part 2: 
+### part 2: 
 
 block size				 	  32		 64		   96	    128		  256		512		 1024
 ms						  0.7245 	 0.6811    0.7230    0.8163    0.8007    0.7196    0.8156
