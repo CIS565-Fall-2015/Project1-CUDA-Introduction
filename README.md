@@ -6,7 +6,7 @@ CUDA Introduction
 * Megan Moore
 * Tested on: Windows 7, i7-4770 @ 3.40GHz 16GB (Moore 100 Lab C)
 
-### (TODO: Your README)
+![](images/Planets.png "Planets after approximately 30 seconds")
 
 Include screenshots, analysis, etc. (Remember, this is public, so don't put
 anything here that you don't want to share with the world.)
