@@ -1,3 +1,21 @@
+Zhimin Zhao
+
+ASUS-NotebookSKU G551JM
+
+personal laptop
+
+##**Screenshots**
+
+![part 1-1](images/1.PNG)
+
+![part 1-2](images/2.PNG)
+
+![part 1-3](images/2.PNG)
+
+![part 1-4](images/2.PNG)
+
+![performance analysis](images/5.PNG)
+
 ##**Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?**
 
 To alter block sizes (shown below) affects fps performance, however, the impact in this project is almost negligible. I think the performance should increase to a peak and then goes down as the block size raises, since at the first stage the larger block size the higher occupancy, which is the ratio of the number of active warps per multiprocessor to the maximum number of warps that can be active on the multiprocessor at once. Although higher occupancy does not always mean higher performance, but it is a useful metric for gauging the latency hiding ability of a kernel. Well, as the size of block continue growing, developers might find 66% is enough to saturate the bandwidth and the performance gradually ceases to advance. 
