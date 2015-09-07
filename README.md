@@ -14,10 +14,10 @@ In this part, I was supposed to work on the framework build by Kai and complete 
 
 ## ScreenShots
 
-![](images/N-Body Simulation.png)
+![](images/NBodySimulation.png)
 
 
-![](images/N-Body Profile.png)
+![](images/NBodyProfile.png)
 
 
 
