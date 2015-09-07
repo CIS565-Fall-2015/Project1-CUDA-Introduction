@@ -18,11 +18,11 @@ CUDA Introduction
 
   As the number of planets increases, the performance speed decreases.  Up until about 2000 planets, the suimulation is able to run at the highest possible fps.  However, the performance quickly drops once more planets are added.  At 2100 planets, it can only run at 45 fps, and 30 fps at 2200 planets.  When there are 5000 planets in the simulation, the fps is 15.  
   
-  average computation time per frame in milliseconds
-  14.4 - 2000 planets
-  31.3 - 3000 planets
-  55.5 - 4000 planets
-  86.1 - 5000 planets
+  average computation time per frame in milliseconds \n
+  14.4 - 2000 planets \n
+  31.3 - 3000 planets \n
+  55.5 - 4000 planets \n
+  86.1 - 5000 planets \n
   
   Each frame requires N^2 calculations.  Thus, as N increases, more time will be needed for each frame update, and shows why the computation time per frame increases as the planets increase.  This is why the performance will decrease when the number of planets is increased.  
   
