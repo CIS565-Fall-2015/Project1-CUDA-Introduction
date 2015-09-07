@@ -35,8 +35,8 @@ If we plot graphs with kernUpdateAcc and kernUpdateVelPos, it will show that the
 ## Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?
 For such a small input like 5x5 matrices, I would say the performance should be roughly the same. 
 
-####The difference is
 GPU running time = cudaMemcpy + kernel func time (for each element in mat C)
+
 CPU running time = dim * dim * time spent on each element in mat C
 
 So if the matrix dimension is low enough that the time spent on cudaMemcpy is longer (which might be the case for mul_add and mul_sub), CPU would win this performance contest. Otherwise, GPU will be slightly faster.
