@@ -266,5 +266,5 @@ void Nbody::stepSimulation(float dt) {
 	float milliseconds = 0;
 	cudaEventElapsedTime(&milliseconds, start, stop);
 
-	printf("%f", milliseconds);
+	//printf("%f \n", milliseconds);
 }
