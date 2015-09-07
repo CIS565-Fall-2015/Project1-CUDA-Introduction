@@ -193,7 +193,7 @@ __device__ glm::vec3 accelerate(int N, int iSelf, const glm::vec3 *pos) {
 	float rad = glm::length(my_pos);
 	float acc_mag = starMass*G / (rad*rad + EPSILON);
 	glm::vec3 rad_unit = glm::normalize(-my_pos);
-	acc = acc_mag*rad_unit;
+	acc += acc_mag*rad_unit;
 
     // HINT: You may want to write a helper function that will compute the acceleration at
     //   a single point due to a single other mass. Be careful that you protect against
@@ -246,7 +246,7 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
-	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+	dim3 fullBlocksPerGrid((int)ceil(float(numObjects) / float(blockSize)));
 	kernUpdateAcc << <fullBlocksPerGrid, threadsPerBlock >> >(numObjects, dt, dev_pos, dev_acc);
 	kernUpdateVelPos << <fullBlocksPerGrid, threadsPerBlock >> >(numObjects, dt, dev_pos, dev_vel, dev_acc);
 }

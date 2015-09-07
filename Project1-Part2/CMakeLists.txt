@@ -66,7 +66,6 @@ endif()
 add_subdirectory(src)
 
 cuda_add_executable(${CMAKE_PROJECT_NAME}
-    "src/main.hpp"
     "src/main.cpp"
     )
 
