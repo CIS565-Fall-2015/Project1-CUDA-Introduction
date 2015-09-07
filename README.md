@@ -3,76 +3,22 @@ CUDA Introduction
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 1**
 
-* (TODO) YOUR NAME HERE
-* Tested on: (TODO) Windows 22, i7-2222 @ 2.22GHz 22GB, GTX 222 222MB (Moore 2222 Lab)
+* SANCHIT GARG
+* Tested on: Mac OSX 10.10.4, i7 @ 2.4 GHz, GT 650M 1GB (Personal Computer)
 
-### (TODO: Your README)
-
-Include screenshots, analysis, etc. (Remember, this is public, so don't put
-anything here that you don't want to share with the world.)
-
-Instructions (delete me)
-========================
-
-This is due Monday, September 7.
-
-**Summary:** In this project, you will get some real experience writing simple
-CUDA kernels, using them, and analyzing their performance. You'll implement the
-simulation step of an N-body simulation, and you'll write some GPU-accelerated
-matrix math operations.
-
-## Part 0: Nothing New
-
-This project (and all other CUDA projects in this course) requires an NVIDIA
-graphics card with CUDA capability. Any card with Compute Capability 2.0
-(`sm_20`) or greater will work. Check your GPU on this
-[compatibility table](https://developer.nvidia.com/cuda-gpus).
-If you do not have a personal machine with these specs, you may use
-computers in the SIG Lab and Moore 100B/C.
-
-**HOWEVER**: If you need to use the lab computer for your development, you will
-not presently be able to do GPU performance profiling. This will be very
-important for debugging performance bottlenecks in your program. If you do not
-have administrative access to any CUDA-capable machine, please email the TA.
+### SANCHIT GARG: ReadMe
 
 ## Part 1: N-body Simulation
 
-### 1.0. The Usual
+In this part, I was supposed to work on the framework build by Kai and complete a few function for the amazing N-Body simulation. I wrote the code to find the accelaration of all the planets and then update their position using forward euler integration. Next, we call the CUDA kernels to update the position of all the particles in parallel.
 
-See Project 0, Parts 1-3 for reference.
+## ScreenShots
 
-If you are using Nsight and started Project 0 early, note that things have
-changed slightly. Instead of creating a new project, use
-*File->Import->General->Existing Projects Into Workspace*, and select the
-`Project1-Part1` folder as the root directory. Under *Project->Build
-Configurations->Set Active...*, you can now select various Release and Debug
-builds.
-
-* `src/` contains the source code.
-* `external/` contains the binaries and headers for GLEW, GLFW, and GLM.
-
-**CMake note:** Do not change any build settings or add any files to your
-project directly (in Visual Studio, Nsight, etc.) Instead, edit the
-`src/CMakeLists.txt` file. Any files you create must be added here. If you edit
-it, just rebuild your VS/Nsight project to sync the changes into the IDE.
+![](images/N-Body Simulation.png)
 
 
-### 1.1. CUDA Done That With My Eyes Closed
+![](images/N-Body Profile.png)
 
-To get used to using CUDA kernels, you'll write simple CUDA kernels and
-kernel invocations for performing an N-body gravitational simulation.
-The following source files are included in the project:
-
-* `src/main.cpp`: Performs all of the CUDA/OpenGL setup and OpenGL
-  visualization.
-* `src/kernel.cu`: CUDA device functions, state, kernels, and CPU functions for
-  kernel invocations.
-
-1. Search the code for `TODO`:
-   * `src/kernel.cu`: Use what you learned in the first lecture to
-     figure out how to resolve these 4 TODOs.
-
-Take a screenshot. Commit and push your code changes.
 
 
 ## Part 2: Matrix Math
