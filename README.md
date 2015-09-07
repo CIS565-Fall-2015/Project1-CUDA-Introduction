@@ -12,7 +12,7 @@ This repository contains HW1 for CIS 565 2015, a CUDA nbody simulation and a bas
 
 ## Questions
 
-1. Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?
+### Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?
 
 ![](images/blocksize_vs_fps.png)
 
@@ -32,7 +32,7 @@ For Part 1, increasing the block size improves performance (measured as fps with
 
 For Part 2, increasing the block size beyond the matrix dimensions does not improve performance as this gives the program more threads than it has data for. 
 
-2. Part 1: How does changing the number of planets affect performance? Why?
+### Part 1: How does changing the number of planets affect performance? Why?
 
 ![](images/planets_vs_fps.png)
 
@@ -53,6 +53,6 @@ For Part 2, increasing the block size beyond the matrix dimensions does not impr
 
 Increasing the number of planets causes an overall exponential performance hit. This would be expected in a single core system as the planet influence detection is naive, that is, O(n^2) where n is the number of planets.However, the performance hit does not seem to have been exponential for smaller numbers of planets. This is likely because the GPU still has the resources to compute all the influences in parallel. Thus, the performance hit should be approximately linear until the GPU's cores are saturated.
 
-3. Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?
+### Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?
 
 The GPU code should perform significantly faster for very large matrices. A n*n matrix will require n*n adds to compute matrix addition, requiring n^2 serial computations on a single core. In parallel this becomes n*n / (number of cores available, capped at n*n). However, the performance difference for small matrices may be similar or worse depending on the overhead of transferring the matrices from host to device memory and launching threads.
