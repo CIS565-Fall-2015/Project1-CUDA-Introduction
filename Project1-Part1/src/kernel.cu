@@ -140,8 +140,8 @@ void Nbody::initSimulation(int N) {
  * Copy the planet positions into the VBO so that they can be drawn by OpenGL.
  */
 __global__ void kernCopyPlanetsToVBO(int N, glm::vec3 *pos, float *vbo, float s_scale) {
-    int index = threadIdx.x + (blockIdx.x * blockDim.x);
 
+	int index = threadIdx.x + (blockIdx.x * blockDim.x);
     float c_scale = -1.0f / s_scale;
 
     if (index < N) {
@@ -173,26 +173,42 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  * Compute the acceleration on the body with index `iSelf` due to the `N`
  * bodies in the array `pos`.
  */
-__device__ glm::vec3 accelerate(int N, int iSelf, const glm::vec3 *pos) {
-    // TODO: Compute the acceleration on `my_pos` due to:
-    //   * The star at the origin (with mass `starMass`)
-    //   * All of the *other* planets (with mass `planetMass`)
-    // Return the sum of all of these contributions.
 
-    // HINT: You may want to write a helper function that will compute the acceleration at
-    //   a single point due to a single other mass. Be careful that you protect against
-    //   division by very small numbers.
-    // HINT: Use Newtonian gravitational acceleration:
-    //       G M
-    //  g = -----
-    //       r^2
-    //  where:
-    //    * G is the universal gravitational constant (already defined for you)
-    //    * M is the mass of the other object
-    //    * r is the distance between this object and the other object
 
-    return glm::vec3(0.0f);
-}
+    
+	__device__ glm::vec3 accelerate(int N, int iSelf, const glm::vec3 *pos) {
+		// TODO: Compute the acceleration on `my_pos` due to:
+
+		glm::vec3 origin = glm::vec3(0, 0, 0);
+		glm::vec3 my_pos = glm::vec3(pos[iSelf].x, pos[iSelf].y, pos[iSelf].z);
+		//*********star*************
+		glm::vec3 star_r = origin - my_pos;
+		double star_l = glm::length(star_r);
+		glm::vec3 star_n = glm::normalize(star_r);
+		double star_g = G*starMass / (star_l*star_l + sqrt(EPSILON));//+ EPSILON);
+		glm::vec3 star_gdir = glm::vec3(star_g*star_n.x, star_g*star_n.y, star_g*star_n.z);
+
+		glm::vec3 planet_gdir(0, 0, 0);
+
+		for (int i = 0; i < N; i++) {
+			if (i != iSelf){
+				glm::vec3 other_pos = glm::vec3(pos[i].x, pos[i].y, pos[i].z);
+
+				glm::vec3 planet_r = other_pos - my_pos;
+				glm::vec3 planet_n = glm::normalize(planet_r);
+				double planet_l = glm::length(planet_r);
+				double planet_g = G*planetMass / (planet_l*planet_l + sqrt(EPSILON));// EPSILON);
+				glm::vec3 temp = glm::vec3(planet_g*planet_n.x, planet_g*planet_n.y, planet_g*planet_n.z);
+
+				planet_gdir += temp;
+			}
+		}
+		glm::vec3 result = star_gdir + planet_gdir;
+		return result;
+
+	}
+    
+
 
 /**
  * For each of the `N` bodies, update its acceleration.
@@ -202,6 +218,10 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement kernUpdateAcc.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+	int index = threadIdx.x + (blockIdx.x * blockDim.x);
+	if (index < N){
+		acc[index] = accelerate(N, index, pos); 
+	}
 }
 
 /**
@@ -210,6 +230,11 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
     // TODO: implement kernUpdateVelPos.
+	int index = threadIdx.x + (blockIdx.x * blockDim.x);
+	if (index < N){
+		vel[index] += acc[index] * dt;
+		pos[index] += vel[index] * dt;
+	}
 }
 
 /**
@@ -218,6 +243,12 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
+
+	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+	kernUpdateAcc << < fullBlocksPerGrid, blockSize >> >(numObjects, dt, dev_pos, dev_acc);
+	kernUpdateVelPos << < fullBlocksPerGrid, blockSize >> >(numObjects, dt, dev_pos, dev_vel, dev_acc);
+
+	//kernUpdateVelPos <<< fullBlocksPerGrid, threadsPerBlock >>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
 }
 
 void Nbody::endSimulation() {
