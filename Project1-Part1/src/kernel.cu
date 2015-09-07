@@ -27,7 +27,7 @@ void checkCUDAError(const char *msg, int line = -1) {
  *****************/
 
 /*! Block size used for CUDA kernel launch. */
-#define blockSize 128
+#define blockSize 256
 
 /*! Mass of one "planet." */
 #define planetMass 3e8f
@@ -169,8 +169,6 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
  ******************/
 
 /*! Mass of one "planet." */
-#define gConstant 6.673e-11
-
 __device__  float computeGravityForce(const glm::vec3 this_obj_pos, const glm::vec3 other_obj_pos,
 		const float other_obj_mass){
 
@@ -252,13 +250,47 @@ __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel
 /**
  * Step the entire N-body simulation by `dt` seconds.
  */
+double total_acc = 0;
+double total_vel = 0;
+int count = 0;
 void Nbody::stepSimulation(float dt) {
     // TODO: Using the CUDA kernels you wrote above, write a function that
     // calls the kernels to perform a full simulation step.
 
-    dim3 fullBlocksPerGrid((int)ceil(float(numObjects) / float(blockSize)));
-	kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
-	kernUpdateVelPos<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
+
+    int tileSize = (int)ceil(float(numObjects) / float(blockSize));
+    float timeValue;
+
+	cudaEvent_t beginEvent_acc;
+	cudaEvent_t endEvent_acc;
+
+	cudaEventCreate( &beginEvent_acc );
+	cudaEventCreate( &endEvent_acc );
+	cudaEventRecord( beginEvent_acc, 0 );
+	kernUpdateAcc<<<tileSize, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
+	cudaEventRecord( endEvent_acc, 0 );
+	cudaEventSynchronize( endEvent_acc );
+	cudaEventElapsedTime( &timeValue, beginEvent_acc, endEvent_acc );
+	total_acc += timeValue;
+
+	cudaEvent_t beginEvent_vel;
+	cudaEvent_t endEvent_vel;
+	cudaEventCreate( &beginEvent_vel );
+	cudaEventCreate( &endEvent_vel );
+	cudaEventRecord( beginEvent_vel, 0 );
+	kernUpdateVelPos<<<tileSize, blockSize>>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
+	cudaEventRecord( endEvent_vel, 0 );
+	cudaEventSynchronize( endEvent_vel );
+	cudaEventElapsedTime( &timeValue, beginEvent_vel, endEvent_vel );
+	total_vel += timeValue;
+
+	count++;
+
+	if(count == 3000) {
+		printf("Time_acc: %.4f ms \n", total_acc/count);
+		printf("Time_velpos: %.4f ms \n", total_vel/count);
+	}
+
 }
 
 void Nbody::endSimulation()

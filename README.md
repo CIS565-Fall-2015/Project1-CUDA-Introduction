@@ -3,212 +3,54 @@ CUDA Introduction
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 1**
 
-* (TODO) YOUR NAME HERE
-* Tested on: (TODO) Windows 22, i7-2222 @ 2.22GHz 22GB, GTX 222 222MB (Moore 2222 Lab)
+* Ratchpak (Dome) Pongmongkol
+* Tested on: OSX Yosemite 10.10.5, i7 @ 2.4GHz 16GB, GT 650M 1024MB (rMBP Early 2013)
 
-### (TODO: Your README)
+###  N-body Simulation: Screenshot 
 
-Include screenshots, analysis, etc. (Remember, this is public, so don't put
-anything here that you don't want to share with the world.)
+![](images/SG.png)
 
-Instructions (delete me)
-========================
+### Performance Analysis
 
-This is due Monday, September 7.
+## Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?
+#Part 1:
+N = 10000
 
-**Summary:** In this project, you will get some real experience writing simple
-CUDA kernels, using them, and analyzing their performance. You'll implement the
-simulation step of an N-body simulation, and you'll write some GPU-accelerated
-matrix math operations.
+block size				 	  32		 64		   96	    128		  256
+tile size					 313		157		   79	     40		   20
+fps 	   		   			 7.5       14.0      17.4      19.7      20.4
+kernUpdateAcc(ms) 		128.9740    69.0305   55.1899   47.2931   47.1370
+kernUpdateVelPos(ms) 	  0.0356 	 0.0303    0.0290    0.0297    0.0298
 
-## Part 0: Nothing New
+** This benchmark is assumes that tile size = ceil(N / block size)
+	- If N is large enough, changing block size will also change tile size
+** The result is roughly the same between block size = 128 to block size = 1024
 
-This project (and all other CUDA projects in this course) requires an NVIDIA
-graphics card with CUDA capability. Any card with Compute Capability 2.0
-(`sm_20`) or greater will work. Check your GPU on this
-[compatibility table](https://developer.nvidia.com/cuda-gpus).
-If you do not have a personal machine with these specs, you may use
-computers in the SIG Lab and Moore 100B/C.
+My assumption : When the block size is small, the tile size increases. One reason I could think of is that the number of concurrent block is limited (resulting in some block having to wait in the queue). This 'delay' disappears when the tile size decreases to the point that or all threads can run concurrently, so the performance after block size = 128 remains the same. It is also possible that this might be caused by block-switching overhead.
 
-**HOWEVER**: If you need to use the lab computer for your development, you will
-not presently be able to do GPU performance profiling. This will be very
-important for debugging performance bottlenecks in your program. If you do not
-have administrative access to any CUDA-capable machine, please email the TA.
+# part 2: 
 
-## Part 1: N-body Simulation
+block size				 	  32		 64		   96	    128		  256		512		 1024
+ms						  0.7245 	 0.6811    0.7230    0.8163    0.8007    0.7196    0.8156
 
-### 1.0. The Usual
+** averaged from 100 times of execution
 
-See Project 0, Parts 1-3 for reference.
+My assumption: Since the number of threads per block must be a multiple of 32 (which is already larger than dim*dim, or number of concurrent threads). Also, changing the block size will still result as having tile size = 1. This means changing the block size shouldn't affect its performance.
 
-If you are using Nsight and started Project 0 early, note that things have
-changed slightly. Instead of creating a new project, use
-*File->Import->General->Existing Projects Into Workspace*, and select the
-`Project1-Part1` folder as the root directory. Under *Project->Build
-Configurations->Set Active...*, you can now select various Release and Debug
-builds.
+## Part 1: How does changing the number of planets affect performance? Why?
+Block size 256
+N							1000	   2500      5000      7500      10000
+fps 	   		   			60.0	   60.0		 57.3      32.7       20.4
+kernUpdateAcc(ms) 		  4.2679	 6.2785	  13.9847   27.0813    47.1370
+kernUpdateVelPos(ms) 	  0.0208	 0.0199	   0.0196    0.0249     0.0298   
 
-* `src/` contains the source code.
-* `external/` contains the binaries and headers for GLEW, GLFW, and GLM.
+If we plot graphs with kernUpdateAcc and kernUpdateVelPos, it will show that the first one is increasing exponentially as N grows, while the latter is growing linearly. This makes perfect sense since gravity calculation is O(N^2) and velocity/postion updating is O(N) 
 
-**CMake note:** Do not change any build settings or add any files to your
-project directly (in Visual Studio, Nsight, etc.) Instead, edit the
-`src/CMakeLists.txt` file. Any files you create must be added here. If you edit
-it, just rebuild your VS/Nsight project to sync the changes into the IDE.
+## Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?
+For such a small input like 5x5 matrices, I would say the performance should be roughly the same. 
 
+The difference is that  
+	GPU running time = cudaMemcpy + kernel func time (for each element in mat C)
+	CPU running time = dim * dim * time spent on each element in mat C
 
-### 1.1. CUDA Done That With My Eyes Closed
-
-To get used to using CUDA kernels, you'll write simple CUDA kernels and
-kernel invocations for performing an N-body gravitational simulation.
-The following source files are included in the project:
-
-* `src/main.cpp`: Performs all of the CUDA/OpenGL setup and OpenGL
-  visualization.
-* `src/kernel.cu`: CUDA device functions, state, kernels, and CPU functions for
-  kernel invocations.
-
-1. Search the code for `TODO`:
-   * `src/kernel.cu`: Use what you learned in the first lecture to
-     figure out how to resolve these 4 TODOs.
-
-Take a screenshot. Commit and push your code changes.
-
-
-## Part 2: Matrix Math
-
-In this part, you'll set up a CUDA project with some simple matrix math
-functionality. Put this in the `Project1-Part2` directory in your repository.
-
-### 1.1. Create Your Project
-
-You'll need to copy over all of the boilerplate project-related files from
-Part 1:
-
-* `cmake/`
-* `external/`
-* `.cproject`
-* `.project`
-* `GNUmakefile`
-* `CMakeLists.txt`
-* `src/CMakeLists.txt`
-
-Next, create empty text files for your main function and CUDA kernels:
-
-* `src/main.cpp`
-* `src/matrix_math.h`
-* `src/matrix_math.cu`
-
-As you work through the next steps, find and use relevant code from Part 1 to
-get the new project set up: includes, error checking, initialization, etc.
-
-### 1.2. Setting Up CUDA Memory
-
-As discussed in class, there are two separate memory spaces: host memory and
-device memory. Host memory is accessible by the CPU, while device memory is
-accessible by the GPU.
-
-In order to allocate memory on the GPU, we need to use the CUDA library
-function `cudaMalloc`. This reserves a portion of the GPU memory and returns a
-pointer, like standard `malloc` - but the pointer returned by `cudaMalloc` is
-in the GPU memory space and is only accessible from GPU code.
-
-We can copy memory to and from the GPU using `cudaMemcpy`. Like C `memcpy`,
-you will need to specify the size of memory that you are copying. But
-`cudaMemcpy` has an additional argument - the last argument specifies the
-whether the copy is from host to device, device to host, device to device, or
-host to host.
-
-* Look up documentation on `cudaMalloc` and `cudaMemcpy` if you need to find
-  out how to use them - they're not quite obvious.
-
-In an initialization function in `matrix_math.cu`, initialize two 5x5 matrices
-on the host and two on the device. Prefix your variables with `hst_` and
-`dev_`, respectively, so you know what kind of pointers they are!
-These arrays can each be represented as a 1D array of floats:
-
-`{ A_00, A_01, A_02, A_03, A_04, A_10, A_11, A_12, ... }`
-
-Don't forget to call your initialization function from your `main` function in
-`main.cpp`.
-
-### 1.3. Creating CUDA Kernels
-
-Given 5x5 matrices A, B, and C (each represented as above), implement the
-following functions as CUDA kernels (`__global__`):
-
-* `mat_add(A, B, C)`: `C` is overwritten with the result of `A + B`
-* `mat_sub(A, B, C)`: `C` is overwritten with the result of `A - B`
-* `mat_mul(A, B, C)`: `C` is overwritten with the result of `A * B`
-
-You should write some tests to make sure that the results of these operations
-are as you expect.
-
-Tips:
-
-* `__global__` and `__device__` functions only have access to memory that is
-  stored on the device. Any data that you want to use on the CPU or GPU must
-  exist in the right memory space. If you need to move data, you can use
-  `cudaMemcpy`.
-* The triple angle brackets `<<< >>>` provide parameters to the CUDA kernel
-  invocation: tile size, block size, and threads per warp.
-* Don't worry if your IDE doesn't understand some CUDA syntax (e.g.
-  `__device__` or `<<< >>>`). By default, it may not understand CUDA
-  extensions.
-
-
-## Part 3: Performance Analysis
-
-For this project, we will guide you through your performance analysis with some
-basic questions. In the future, you will guide your own performance analysis -
-but these simple questions will always be critical to answer. In general, we
-want you to go above and beyond the suggested performance investigations and
-explore how different aspects of your code impact performance as a whole.
-
-The provided framerate meter (in the window title) will be a useful base
-metric, but adding your own `cudaTimer`s, etc., will allow you to do more
-fine-grained benchmarking of various parts of your code.
-
-REMEMBER:
-* Performance should always be measured relative to some baseline when
-  possible. A GPU can make your program faster - but by how much?
-* If a change impacts performance, show a comparison. Describe your changes.
-* Describe the methodology you are using to benchmark.
-* Performance plots are a good thing.
-
-### Questions
-
-* Parts 1 & 2: How does changing the tile and block sizes affect performance?
-  Why?
-* Part 1: How does changing the number of planets affect performance? Why?
-* Part 2: Without running comparisons of CPU code vs. GPU code, how would you
-  expect the performance to compare? Why? What might be the trade-offs?
-
-**NOTE: Nsight performance analysis tools *cannot* presently be used on the lab
-computers, as they require administrative access.** If you do not have access
-to a CUDA-capable computer, the lab computers still allow you to do timing
-mesasurements! However, the tools are very useful for performance debugging.
-
-
-## Part 4: Write-up
-
-1. Update all of the TODOs at the top of this README.
-2. Add your performance analysis.
-
-
-## Submit
-
-If you have modified any of the `CMakeLists.txt` files at all (aside from the
-list of `SOURCE_FILES`), you must test that your project can build in Moore
-100B/C. Beware of any build issues discussed on the Google Group.
-
-1. Open a GitHub pull request so that we can see that you have finished.
-   The title should be "Submission: YOUR NAME".
-2. Send an email to the TA (gmail: kainino1+cis565@) with:
-   * **Subject**: in the form of `[CIS565] Project 0: PENNKEY`
-   * Direct link to your pull request on GitHub
-   * In the form of a grade (0-100+), evaluate your own performance on the
-     project.
-   * Feedback on the project itself, if any.
-
-And you're done!
+So if the matrix dimension is low enough that the time spent on cudaMemcpy is longer (which might be the case for mul_add and mul_sub), CPU would win this performance contest. Otherwise, GPU will be slightly faster.
