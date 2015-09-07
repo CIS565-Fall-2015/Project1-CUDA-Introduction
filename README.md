@@ -3,12 +3,15 @@
 To alter block sizes (shown below) affects fps performance, however, the impact in this project is almost negligible. I think the performance should increase to a peak and then goes down as the block size raises, since at the first stage the larger block size the higher occupancy, which is the ratio of the number of active warps per multiprocessor to the maximum number of warps that can be active on the multiprocessor at once. Although higher occupancy does not always mean higher performance, but it is a useful metric for gauging the latency hiding ability of a kernel. Well, as the size of block continue growing, developers might find 66% is enough to saturate the bandwidth and the performance gradually ceases to advance. 
 
 Attached is my part-1 test result:
+
 5000 planets, 32-2048 threads per block: 72.9 ~ 73.8 fps
+
 500000 planets, 2048 threads per block: Nvadia driver crashed
 
 Changing tile sizes does have a minor impact on the performance, in light of execution time. For matrix addition and subtraction, smaller block size runs faster, while there is negligible difference for multiplication.
 
 Attached is my part-2 test result:
+
 (1, 1) Block, (6, 6) Thread: Add -- 0.007168, Sub -- 0.007136, Mul -- 0.008192
 
 (1, 3) Block, (2, 6) Thread: Add -- 0.008192, Sub -- 0.007168, Mul -- 0.008192
