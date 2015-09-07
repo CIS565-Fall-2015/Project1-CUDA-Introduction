@@ -14,7 +14,7 @@
 
 #define VISUALIZE 1
 
-const int N_FOR_VIS = 5000;
+const int N_FOR_VIS = 500;
 const float DT = 0.2f;
 
 /**
