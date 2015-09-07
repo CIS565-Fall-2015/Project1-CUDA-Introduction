@@ -1,4 +1,4 @@
-Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?
+##*Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?*
 
 To alter block sizes (shown below) affects fps performance, however, the impact in this project is almost negligible. I think the performance should increase to a peak and then goes down as the block size raises, since at the first stage the larger block size the higher occupancy, which is the ratio of the number of active warps per multiprocessor to the maximum number of warps that can be active on the multiprocessor at once. Although higher occupancy does not always mean higher performance, but it is a useful metric for gauging the latency hiding ability of a kernel. Well, as the size of block continue growing, developers might find 66% is enough to saturate the bandwidth and the performance gradually ceases to advance. 
 
@@ -17,9 +17,7 @@ Attached is my part-2 test result:
 
 
 
-
-
-Part 1: How does changing the number of planets affect performance? Why?
+##*Part 1: How does changing the number of planets affect performance? Why?*
 
 The overall performance should rest on the best performance of a single block.Reducing workload immediately yields a big improvement in performance, however the improvement diminishes as planet population shrinks.
 
@@ -27,7 +25,7 @@ The overall performance should rest on the best performance of a single block.Re
 
 
 
-Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?
+##*Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?*
 
 I expect that GPU code runs even faster as far as execution time is concerned. Just as Coach Cozzi had mentioned, CPU code tend to execute sequential nested loops that cannot be carried out quite well in parallel. E.g. the multiplication of two square matrix written in CPU code would have an algorithm complexity up to n^3. Meanwhile GPU code can take good advantage of the parallel algorithm, where each thread runs in O(n). If we consider the scheduling overhead to be neglegible, then GPU code will be considerably faster thanks to algorithm complexity difference.
 
