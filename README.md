@@ -10,9 +10,9 @@ personal laptop
 
 ![part 1-2](images/2.PNG)
 
-![part 1-3](images/2.PNG)
+![part 1-3](images/3.PNG)
 
-![part 1-4](images/2.PNG)
+![part 1-4](images/4.PNG)
 
 ![performance analysis](images/5.PNG)
 
