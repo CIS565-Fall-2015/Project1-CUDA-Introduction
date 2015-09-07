@@ -1,4 +1,5 @@
 set(SOURCE_FILES
+    "config.h"
     "matrix_math.h"
     "matrix_math.cu"
     )
