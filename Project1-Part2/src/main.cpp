@@ -39,20 +39,20 @@ int main(int argc, char* argv[]) {
     projectName = "565 CUDA Intro: Matrix_Math";
 
 	
-	//on the host
-	hst_matrix1 = new float[25];
-	hst_matrix2 = new float[25];
-	hst_matrix3 = new float[25];
+	////on the host
+	//hst_matrix1 = new float[25];
+	//hst_matrix2 = new float[25];
+	//hst_matrix3 = new float[25];
 
-	//on the device
-	cudaMalloc((void**)&dev_matrix1, 25 * sizeof(float));
-	checkCUDAErrorWithLine2("cudaMalloc dev_matrix1 failed!");
+	////on the device
+	//cudaMalloc((void**)&dev_matrix1, 25 * sizeof(float));
+	//checkCUDAErrorWithLine2("cudaMalloc dev_matrix1 failed!");
 
-	cudaMalloc((void**)&dev_matrix2, 25 * sizeof(float));
-	checkCUDAErrorWithLine2("cudaMalloc dev_matrix2 failed!");
+	//cudaMalloc((void**)&dev_matrix2, 25 * sizeof(float));
+	//checkCUDAErrorWithLine2("cudaMalloc dev_matrix2 failed!");
 
-	cudaMalloc((void**)&dev_matrix3, 25 * sizeof(float));
-	checkCUDAErrorWithLine2("cudaMalloc dev_matrix3 failed!");
+	//cudaMalloc((void**)&dev_matrix3, 25 * sizeof(float));
+	//checkCUDAErrorWithLine2("cudaMalloc dev_matrix3 failed!");
 
     if (init(argc, argv)) {
         mainLoop();
@@ -134,7 +134,7 @@ bool init(int argc, char **argv) {
 
     cudaGLRegisterBufferObject(planetVBO);
     // Initialize Matrix Math
-	//Matrix_Math::initlization();
+	Matrix_Math::initlization();
 
     projection = glm::perspective(fovy, float(width) / float(height), zNear, zFar);
     glm::mat4 view = glm::lookAt(cameraPosition, glm::vec3(0), glm::vec3(0, 0, 1));

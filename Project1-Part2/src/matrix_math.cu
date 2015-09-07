@@ -44,6 +44,7 @@ void Matrix_Math::initlization()
 	hst_matrix2 = new float[25];
 	hst_matrix3 = new float[25];
 
+	cudaError_t err = cudaGetLastError();
 	//on the device
 	cudaMalloc((void**)&dev_matrix1, 25 * sizeof(float));
 	checkCUDAErrorWithLine("cudaMalloc dev_matrix1 failed!");
