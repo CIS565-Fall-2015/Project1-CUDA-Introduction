@@ -14,7 +14,11 @@ personal laptop
 
 ![part 1-4](images/4.PNG)
 
-![performance analysis](images/5.PNG)
+![performance analysis - 1](images/5.PNG)
+
+![performance analysis - 2](images/6.PNG)
+
+![performance analysis - 3](images/7.PNG)
 
 ##**Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?**
 
