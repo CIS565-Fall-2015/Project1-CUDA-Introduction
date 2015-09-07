@@ -12,8 +12,6 @@ personal laptop
 
 ![part 1-3](images/3.PNG)
 
-![part 1-4](images/4.PNG)
-
 ![performance analysis - 1](images/5.PNG)
 
 ![performance analysis - 2](images/6.PNG)
