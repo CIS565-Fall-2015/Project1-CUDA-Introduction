@@ -21,6 +21,7 @@ void CUDA_matrix_math::teardown() {
 __global__ void mat_add(float *A, float *B, float *C) {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
+	if (i > 4 || j > 4) return;
 	int index = i + j * 5;
 	C[index] = A[index] + B[index];
 }
@@ -28,6 +29,7 @@ __global__ void mat_add(float *A, float *B, float *C) {
 __global__ void mat_sub(float *A, float *B, float *C) {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	int j = blockIdx.y * blockDim.y + threadIdx.y;
+	if (i > 4 || j > 4) return;
 	int index = i + j * 5;
 	C[index] = A[index] - B[index];
 }
@@ -35,10 +37,11 @@ __global__ void mat_sub(float *A, float *B, float *C) {
 __global__ void mat_mul(float *A, float *B, float *C) {
 	int corner_x = blockIdx.x * blockDim.x;
 	int corner_y = blockIdx.y * blockDim.y;
+	if (corner_x + threadIdx.x > 4 || corner_y + threadIdx.y > 4) return;
 	int index = (corner_x + threadIdx.x) + (corner_y + threadIdx.y) * 5;
 	float dot_product = 0.0f;
 
-	// all values are + blockIdx.x * bloxkDim.x + blockIdx.x + blockIdx.y
+	// all values are + blockIdx.x * blockDim.x + blockIdx.y + blockIdx.y
 	// 0  1  2  3  4
 	// 5  6  7  8  9
 	// 10 11 12 13 14
@@ -113,8 +116,8 @@ void CUDA_matrix_math::cuda_mat_mul(float *A, float *B, float *C) {
 	cudaMemcpy(dev_mat_A, A, 25 * sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_mat_B, B, 25 * sizeof(float), cudaMemcpyHostToDevice);
 
-	dim3 dimBlock(5, 5);
-	dim3 dimGrid(1, 1);
+	dim3 dimBlock(1, 1);
+	dim3 dimGrid(5, 5);
 
 	setup_timer_events();
 	cudaEventRecord(start);

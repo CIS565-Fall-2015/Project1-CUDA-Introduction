@@ -78,31 +78,37 @@ int main(int argc, char* argv[]) {
 	printf("\n");
 
 	CUDA_matrix_math::cuda_mat_add(hst_mat_A, hst_mat_B, hst_mat_C);
-	for (int i = 0; i < 25; i++) {
-		assert(nearlyEqual(hst_mat_C[i], hst_add_check[i], EPSILON));
-	}
-
 	printf("After performing addition, C is \n");
 	printMatrix(hst_mat_C, 5);
 	printf("\n");
 
-	CUDA_matrix_math::cuda_mat_sub(hst_mat_A, hst_mat_B, hst_mat_C);
 	for (int i = 0; i < 25; i++) {
-		assert(nearlyEqual(hst_mat_C[i], hst_sub_check[i], EPSILON));
+		float actual = hst_mat_C[i];
+		float expected = hst_add_check[i];
+		assert(nearlyEqual(actual, expected, EPSILON));
 	}
 
+	CUDA_matrix_math::cuda_mat_sub(hst_mat_A, hst_mat_B, hst_mat_C);
 	printf("After performing subtraction, C is \n");
 	printMatrix(hst_mat_C, 5);
 	printf("\n");
 
-	CUDA_matrix_math::cuda_mat_mul(hst_mat_A, hst_mat_B, hst_mat_C);
 	for (int i = 0; i < 25; i++) {
-		assert(nearlyEqual(hst_mat_C[i], hst_mul_check[i], EPSILON));
+		float actual = hst_mat_C[i];
+		float expected = hst_sub_check[i];
+		assert(nearlyEqual(actual, expected, EPSILON));
 	}
 
+	CUDA_matrix_math::cuda_mat_mul(hst_mat_A, hst_mat_B, hst_mat_C);
 	printf("After performing multiplication, C is \n");
 	printMatrix(hst_mat_C, 5);
 	printf("\n");
+
+	for (int i = 0; i < 25; i++) {
+		float actual = hst_mat_C[i];
+		float expected = hst_mul_check[i];
+		assert(nearlyEqual(actual, expected, EPSILON));
+	}
 
 	CUDA_matrix_math::teardown();
 	free(hst_mat_A);
