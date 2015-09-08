@@ -6,14 +6,10 @@ CUDA Introduction
 * Sally Kong
 * Tested on: Windos 8, i7-5500U CPU @ 2.40GHz 2.40 GHz, GEForce 920M (Personal)
 
-## Part 1: N-body Simulation
+## N-body Simulation Screen Capture
 ![](images/Screenshot - NBody.png)
 
-## Part 2: Matrix Math
-
-## Part 3: Performance Analysis
-
-### Questions
+## Performance Analysis
 
 * Parts 1 & 2: How does changing the tile and block sizes affect performance?
   Why?
