@@ -32,5 +32,6 @@ N = 20,000 -> ~4.2fps <br />
 N = 50,000 -> ~0.7fps <br />
 
 * Part 2: Without running comparisons of CPU code vs. GPU code, how would you
-  expect the performance to compare? Why? What might be the trade-offs?
+  expect the performance to compare? Why? What might be the trade-offs? <br />
+
 I would expect the performance in the GPU to be faster because GPUs are optimized for parallel computations, and matrix addition, subtraction or multiplication are "embarrassingly parallel" operations. However, apotential trade-off / bottleneck would be with memory transfer from device-to-host and host-to-device for smaller matrices.
