@@ -11,8 +11,8 @@ CUDA Introduction
 Include screenshots, analysis, etc. 
 ![](images/1.png)
 ![](images/2.png)
-Part1:
-1)change the number of planets N：
+#Part1:
+*1)change the number of planets N：
  N=7000 20fps
  N=5000 40fps
  N=2000 60fps
@@ -27,16 +27,16 @@ Part1:
   ![](images/timeline(n=7000).png)
   From above we can see, when N goes up, usage of GPU goes up,fps goes down,running time goes up.
   Because when the number of planets increase the calculation of gravity increase.
-2)change the block size:
+*2)change the block size:
 while N=7000, block size=56,128,256,gridsize=126,56,28:their fps are all around 20.
 and no much difference in the time.
-3)at project2,because the size of the mat is too small block size do not affect much of the timeline and GPU
+*3)at project2,because the size of the mat is too small block size do not affect much of the timeline and GPU
 block size=1
 ![](images/CUDA_1.2.png)
 ![](images/timeline_1.2.png)
 block size=1000
 ![](images/time.png)
-•Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?
+#Part 2: 
  If the large amount of data is simple and do not have much relevance with each other, the GPU will perform better.
  CPU has cache, it can store and use different kind of data to calculate.
 
