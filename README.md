@@ -28,4 +28,13 @@ Ans: If the number of the parallel computation number is small, I think CPU will
 
 ## ScreenShot
 
+N-Body Sim
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/n-body_sim.png?raw=true)
+
+Performance Analysis
+![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_visualization_on.png?raw=true)
+![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_visualization_off.png?raw=true)
+![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_blocksize_64(base%20128).png?raw=true)
+![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_blocksize_256(base%20128).png?raw=true)
+![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_num_planets_10000(base%205000).png?raw=true)
+![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_num_planets_2000(base%205000).png?raw=true)
