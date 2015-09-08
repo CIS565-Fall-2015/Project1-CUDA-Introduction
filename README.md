@@ -7,7 +7,7 @@ CUDA Introduction
 * Tested on: Windows 7, i7-2649M @ 2.80GHz 8GB, GTX 520 1024MB
 
 #Part1 Screen Capture
-![](images/screen)
+![](images/screen.PNG)
 
 # Perfomance Analysis
 
@@ -19,12 +19,12 @@ This analysis was done with N = 500
 ### Part 1:
 Timing for the two kernal functions (update accelaration, update velocity and position)
 
-![](images/part1-blockSize-analysis)
+![](images/part1-blockSize-analysis.PNG)
 
 ### Part 2:
 Timing for the matrix multiplication function
 
-![](images/part2-blockSize-analysis)
+![](images/part2-blockSize-analysis.PNG)
 
 For both parts my expectation was that by increasing the block size the time taken by the kernal functions would decrease. This effect is seen when increasing the block size from 32 to 128, however, when the block size is increased further performance doesn't improve.
 For a small block size (thread per block) more blocks will be needed for the same problem size N. Changing the block size will improve performance if the number of threads per block makes optimal use of resources.
