@@ -14,7 +14,7 @@
 
 #define VISUALIZE 1
 
-const int N_FOR_VIS = 5000;
+const int N_FOR_VIS = 500;
 const float DT = 0.2f;
 
 /**
@@ -183,6 +183,7 @@ void initShaders(GLuint * program) {
 //====================================
 // Main loop
 //====================================
+float kernalElapsedTime = 0;
 void runCUDA() {
     // Map OpenGL buffer object for writing from CUDA on a single GPU
     // No data is moved (Win & Linux). When mapped to CUDA, OpenGL should not
@@ -193,7 +194,7 @@ void runCUDA() {
     cudaGLMapBufferObject((void**)&dptrvert, planetVBO);
 
     // execute the kernel
-    Nbody::stepSimulation(DT);
+    kernalElapsedTime += Nbody::stepSimulation(DT);
 #if VISUALIZE
     Nbody::copyPlanetsToVBO(dptrvert);
 #endif
@@ -204,12 +205,13 @@ void runCUDA() {
 void mainLoop() {
     double fps = 0;
     double timebase = 0;
-    int frame = 0;
+    int frame = 0, totalFrames = 0;
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        frame++;
+        ++frame;
+		++totalFrames;
         double time = glfwGetTime();
 
         if (time - timebase > 1.0) {
@@ -237,12 +239,17 @@ void mainLoop() {
 
         glUseProgram(0);
         glBindVertexArray(0);
+		glfwSwapBuffers(window);
 #endif
 
-        glfwSwapBuffers(window);
+        
     }
     glfwDestroyWindow(window);
     glfwTerminate();
+
+	std::cout << "Kernal timing : " << (kernalElapsedTime/(totalFrames*100)) << std::endl;
+	std::cout << "Number of frames : " << totalFrames << std::endl;
+
 }
 
 

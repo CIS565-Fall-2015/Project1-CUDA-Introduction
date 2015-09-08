@@ -28,7 +28,7 @@ void checkCUDAError(const char *msg, int line = -1) {
  *****************/
 
 /*! Block size used for CUDA kernel launch. */
-#define blockSize 128
+#define blockSize 64
 
 /*! Mass of one "planet." */
 #define planetMass 3e8f
@@ -38,7 +38,6 @@ void checkCUDAError(const char *msg, int line = -1) {
 
 /*! Size of the starting area in simulation space. */
 const float scene_scale = 1e2;
-
 
 /***********************************************
  * Kernel state (pointers are device pointers) *
@@ -113,6 +112,8 @@ void Nbody::initSimulation(int N) {
     numObjects = N;
     dim3 fullBlocksPerGrid((N + blockSize - 1) / blockSize);
 
+	printf("number of blocks per grid %i, %i, %i \n", fullBlocksPerGrid.x, fullBlocksPerGrid.y, fullBlocksPerGrid.z);
+
     cudaMalloc((void**)&dev_pos, N * sizeof(glm::vec3));
     checkCUDAErrorWithLine("cudaMalloc dev_pos failed!");
 
@@ -168,29 +169,42 @@ void Nbody::copyPlanetsToVBO(float *vbodptr) {
 /******************
  * stepSimulation *
  ******************/
+ /**
+* Helper function to calculate the gravity influence of a body at a certain position
+*/
+__device__ glm::vec3 gravity(glm::vec3 position, glm::vec3 bodyPosition, float mass) {
+
+	//Get the distance
+	glm::vec3 direction = bodyPosition - position;
+	float rSquared = glm::dot(direction, direction);
+
+	direction = glm::normalize(direction);
+
+	if(rSquared < 0.01f) {
+		return glm::vec3(0.0f);
+	} 
+	
+	float g =  (G*mass) / rSquared;
+
+	return direction * g;
+} 
 
 /**
  * Compute the acceleration on a body at `my_pos` due to the `N` bodies in the array `other_planets`.
  */
 __device__  glm::vec3 accelerate(int N, int iSelf, glm::vec3 this_planet, const glm::vec3 *other_planets) {
-    // TODO: Compute the acceleration on `my_pos` due to:
-    //   * The star at the origin (with mass `starMass`)
-    //   * All of the *other* planets (with mass `planetMass`)
-    // Return the sum of all of these contributions.
-
-    // HINT: You may want to write a helper function that will compute the acceleration at
-    //   a single point due to a single other mass. Be careful that you protect against
-    //   division by very small numbers.
-    // HINT: Use Newtonian gravitational acceleration:
-    //       G M
-    //  g = -----
-    //       r^2
-    //  where:
-    //    * G is the universal gravitational constant (already defined for you)
-    //    * M is the mass of the other object
-    //    * r is the distance between this object and the other object
     
-    return glm::vec3(0.0f);
+	glm::vec3 accel = glm::vec3(0.0f);
+	//Add the force due to the star at the origin
+	accel += gravity(this_planet, glm::vec3(0.0f), starMass);
+
+	for(int i = 0; i < N; ++i) {
+		if(i == iSelf)
+			continue;
+		accel += gravity(this_planet, other_planets[i], planetMass);			
+	}
+    
+    return accel;
 }
 
 /**
@@ -201,6 +215,11 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
     // TODO: implement updateAccArray.
     // This function body runs once on each CUDA thread.
     // To avoid race conditions, each instance should only write ONE value to `acc`!
+	int index = threadIdx.x + (blockIdx.x * blockDim.x);
+
+	if(index < N) {
+		acc[index] = accelerate(N, index, pos[index], pos);
+	}
 }
 
 /**
@@ -208,13 +227,33 @@ __global__ void kernUpdateAcc(int N, float dt, const glm::vec3 *pos, glm::vec3 *
  * simple Euler integration scheme. Acceleration must be updated before calling this kernel.
  */
 __global__ void kernUpdateVelPos(int N, float dt, glm::vec3 *pos, glm::vec3 *vel, const glm::vec3 *acc) {
-    // TODO: implement updateVelocityPosition
+    
+	int index = threadIdx.x + (blockIdx.x * blockDim.x);
+
+	if(index < N) {
+		vel[index] = vel[index] + acc[index]*dt;
+		pos[index] = pos[index] + vel[index]*dt;
+	}
 }
 
 /**
  * Step the entire N-body simulation by `dt` seconds.
  */
-void Nbody::stepSimulation(float dt) {
-    // TODO: Using the CUDA kernels you wrote above, write a function that
-    // calls the kernels to perform a full simulation step.
+float Nbody::stepSimulation(float dt) {
+    
+	dim3 fullBlocksPerGrid((numObjects + blockSize - 1) / blockSize);
+	cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
+
+	kernUpdateAcc<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_acc);
+	kernUpdateVelPos<<<fullBlocksPerGrid, blockSize>>>(numObjects, dt, dev_pos, dev_vel, dev_acc);
+	
+	cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+	float elapsedTime; 
+    cudaEventElapsedTime(&elapsedTime , start, stop);
+
+	return elapsedTime;
 }

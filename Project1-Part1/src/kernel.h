@@ -7,6 +7,6 @@
 
 namespace Nbody {
 void initSimulation(int N);
-void stepSimulation(float dt);
+float stepSimulation(float dt);
 void copyPlanetsToVBO(float *vbodptr);
 }
