@@ -56,4 +56,4 @@ The overall performance should rest on the best performance of a single block.Re
 
 I expect that GPU code runs even faster as far as execution time is concerned. Just as Coach Cozzi had mentioned, CPU code tend to execute sequential nested loops that cannot be carried out quite well in parallel. E.g. the multiplication of two square matrix written in CPU code would have an algorithm complexity up to n^3. Meanwhile GPU code can take good advantage of the parallel algorithm, where each thread runs in O(n). If we consider the scheduling overhead to be neglegible, then GPU code will be considerably faster thanks to algorithm complexity difference.
 
-In terms of architecture, CPU might have less memory access, while GPU doesn't.Therefore the trade-off will be the exchange of excessive I/O time with faster arithmetic operations.
+In terms of architecture, CPU might have less memory access, while GPU doesn't.Probably that's why the matrix multiplication computed in parallel is not much faster than traditional sequential algorithm, if the matrices are not that large.Therefore the trade-off will be the exchange of excessive I/O time with faster arithmetic operations.
