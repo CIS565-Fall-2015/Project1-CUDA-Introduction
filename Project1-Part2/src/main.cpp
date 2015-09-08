@@ -43,5 +43,6 @@ int main() {
         }
     }
     cudaMul(hstA, hstB, hstC);
+    printMatrix(hstC);
     return 1;
 }
