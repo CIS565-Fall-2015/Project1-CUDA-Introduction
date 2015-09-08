@@ -47,7 +47,7 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 
 	The first value does not make sense. Maximum possible threads per block is 1024, when I made the block size to be 4096, it gave me a weird result.
 
-	Other than that, we see that reducing the block size and increasing the tile size makes the simulation slower. This might mean that creating blocks is more expensive than creating threads. Hence we must create more threads per block.
+	Other than that, we see that reducing the block size and increasing the tile size makes the simulation slower. This might mean that creating blocks is more expensive than creating threads. Hence we must create more threads per block that creating more blocks.
 
 	Part 2 :
 		Changing the tile and block sizes did not affect the simulation time a lot here. the results are as follows
@@ -69,12 +69,14 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 	Reducing the number of planets speeds up the simulation. The number of planets and the respective FPS is as follows :
 	1. 10000 Planets : 10 FPS
 	2. 8000 Planets : 15 FPS
-	2. 5000 Planets : 36 FPS
-	3. 4000 Planets : 51 FPS
-	4. 3000 Planets : 99 FPS
-	5. 2000 Planets : 180 FPS
-	6. 1000 Planets : 415 FPS
-	7. 500 Planets : 810 FPS
+	3. 5000 Planets : 36 FPS
+	4. 4000 Planets : 51 FPS
+	5. 3000 Planets : 99 FPS
+	6. 2000 Planets : 180 FPS
+	7. 1000 Planets : 415 FPS
+	8. 500 Planets : 810 FPS
+	
+	![](images/PerformanceAnalysis.png)
 		
 	We see that the simulation speed up is drastic after about 4000 planets. This might be because of the number of threads. The maximum number of threads is constant. When we reach about 4000, it is possible that the accelaration calculation for every planet is done on one thread. Hence the calculations become extremely fast. As we decrease the number further, the number of serial calculation for accelaration decrease. Hence making the simulation faster.
 	
