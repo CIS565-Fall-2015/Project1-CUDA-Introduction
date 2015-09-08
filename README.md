@@ -7,7 +7,7 @@ CUDA Introduction
 * Tested on: Windows 7, i7-2649M @ 2.80GHz 8GB, GTX 520 1024MB
 
 #Part1 Screen Capture
-![](images/screen.PNG)
+![](images/screen.png)
 
 # Perfomance Analysis
 
