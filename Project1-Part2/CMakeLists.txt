@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(cis565_nbody)
+project(cis565_matMath)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
@@ -68,7 +68,7 @@ endif()
 add_subdirectory(src)
 
 cuda_add_executable(${CMAKE_PROJECT_NAME}
-    "src/main.hpp"
+	"src/main.hpp"
     "src/main.cpp"
     )
 
