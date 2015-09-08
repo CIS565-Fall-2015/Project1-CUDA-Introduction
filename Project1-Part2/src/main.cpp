@@ -156,14 +156,60 @@ bool init(int argc, char **argv) {
 //====================================
 void mainLoop()
 {
-	//Matrix_Math::initlization();
+	
 	Matrix_Math::GetInputMatrix();
+	
+	//create events
+	cudaEvent_t event1, event2;
+	cudaEventCreate(&event1);
+	cudaEventCreate(&event2);
+	cudaEventRecord(event1, 0);
 	Matrix_Math::MatrixAddOnDevice();
+	cudaEventRecord(event2, 0);
+
+	//synchronize
+	cudaEventSynchronize(event1); //optional
+	cudaEventSynchronize(event2); //wait for the event to be executed!
+
+	//calculate time
+	float dt_ms;
+	cudaEventElapsedTime(&dt_ms, event1, event2);
+
 	Matrix_Math::PrintResult();
+	std::cout << "Mat_Add use: " << dt_ms << "ms..." << std::endl;
+	
+	cudaEvent_t event3, event4;
+	cudaEventCreate(&event3);
+	cudaEventCreate(&event4);
+	cudaEventRecord(event3, 0);
 	Matrix_Math::MatrixSubOnDevice();
+	cudaEventRecord(event4, 0);
+
+	//synchronize
+	cudaEventSynchronize(event3); //optional
+	cudaEventSynchronize(event4); //wait for the event to be executed!
+
+	//calculate time
+	cudaEventElapsedTime(&dt_ms, event3, event4);
+
 	Matrix_Math::PrintResult();
+	std::cout << "Mat_Sub use: " << dt_ms << "ms..." << std::endl;
+	
+	cudaEvent_t event5, event6;
+	cudaEventCreate(&event5);
+	cudaEventCreate(&event6);
+	cudaEventRecord(event5, 0);
 	Matrix_Math::MatrixMulOnDevice();
+	cudaEventRecord(event6, 0);
+	//synchronize
+	cudaEventSynchronize(event5); //optional
+	cudaEventSynchronize(event6); //wait for the event to be executed!
+	//calculate time
+	cudaEventElapsedTime(&dt_ms, event3, event4);
+
 	Matrix_Math::PrintResult();
+	std::cout << "Mat_Mul use: " << dt_ms << "ms..." << std::endl;
+
 	Matrix_Math::Terminate();
 }
 
