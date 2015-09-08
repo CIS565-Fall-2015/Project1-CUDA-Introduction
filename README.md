@@ -3,8 +3,8 @@ CUDA Introduction
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 1**
 
-* (TODO) YOUR NAME HERE
-* Tested on: (TODO) Windows 22, i7-2222 @ 2.22GHz 22GB, GTX 222 222MB (Moore 2222 Lab)
+* Sally Kong
+* Tested on: Windos 8, i7-5500U CPU @ 2.40GHz 2.40 GHz, GEForce 920M (Personal)
 
 ### (TODO: Your README)
 
@@ -36,45 +36,7 @@ important for debugging performance bottlenecks in your program. If you do not
 have administrative access to any CUDA-capable machine, please email the TA.
 
 ## Part 1: N-body Simulation
-
-### 1.0. The Usual
-
-See Project 0, Parts 1-3 for reference.
-
-If you are using the Nsight IDE (not Visual Studio) and started Project 0
-early, note that things have
-changed slightly. Instead of creating a new project, use
-*File->Import->General->Existing Projects Into Workspace*, and select the
-`Project1-Part1` folder as the root directory. Under *Project->Build
-Configurations->Set Active...*, you can now select various Release and Debug
-builds.
-
-* `src/` contains the source code.
-* `external/` contains the binaries and headers for GLEW, GLFW, and GLM.
-
-**CMake note:** Do not change any build settings or add any files to your
-project directly (in Visual Studio, Nsight, etc.) Instead, edit the
-`src/CMakeLists.txt` file. Any files you create must be added here. If you edit
-it, just rebuild your VS/Nsight project to sync the changes into the IDE.
-
-
-### 1.1. CUDA Done That With My Eyes Closed
-
-To get used to using CUDA kernels, you'll write simple CUDA kernels and
-kernel invocations for performing an N-body gravitational simulation.
-The following source files are included in the project:
-
-* `src/main.cpp`: Performs all of the CUDA/OpenGL setup and OpenGL
-  visualization.
-* `src/kernel.cu`: CUDA device functions, state, kernels, and CPU functions for
-  kernel invocations.
-
-1. Search the code for `TODO`:
-   * `src/kernel.cu`: Use what you learned in the first lectures to
-     figure out how to resolve these 4 TODOs.
-
-Take a screenshot. Commit and push your code changes.
-
+![](images/Screenshot - NBody.png)
 
 ## Part 2: Matrix Math
 
