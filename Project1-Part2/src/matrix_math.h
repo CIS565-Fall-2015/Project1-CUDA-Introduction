@@ -6,10 +6,11 @@
 #include <cmath>
 
 namespace Matrix_Math {
-void initialize();
+void initialize(int N);
 void cleanUp();
 
-void mat_add(float *A, float *B, float *C);
-void mat_sub(float *A, float *B, float *C);
-void mat_mul(float *A, float *B, float *C);
+void kernMatAdd(int N, float *hst_mat_a, float *hst_mat_b, float *hst_mat_c);
+void kernMatSub(int N, float *hst_mat_a, float *hst_mat_b, float *hst_mat_c);
+void kernMatMul(int N, float *hst_mat_a, float *hst_mat_b, float *hst_mat_c);
+
 }
