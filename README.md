@@ -44,10 +44,11 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 		|   4096	|	  1 	 |	   1	 |				
 		--------------------------------------
 		
-		The first value does not make sense. Maximum possible threads per block is 1024, when I made the block size to be 4096, it gave me a weird result.
-		
-		Other than that, we see that reducing the block size and increasing the tile size makes the simulation slower. This might mean that creating blocks is more expensive than creating threads. Hence we must create more threads per block.
-		
+
+	The first value does not make sense. Maximum possible threads per block is 1024, when I made the block size to be 4096, it gave me a weird result.
+
+	Other than that, we see that reducing the block size and increasing the tile size makes the simulation slower. This might mean that creating blocks is more expensive than creating threads. Hence we must create more threads per block.
+
 	Part 2 :
 		Changing the tile and block sizes did not affect the simulation time a lot here. the results are as follows
 		
@@ -59,8 +60,9 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 		|    10		|	  3 	 |	 0.051	 |
 		|    25		|	  1 	 |	 0.050	 |				
 		--------------------------------------
+		
 
-		The calculations are not significant enough to effect the performance much. Hence changing the block or thread size does not change running time.
+	The calculations are not significant enough to effect the performance much. Hence changing the block or thread size does not change running time.
 
 
 * Part 1: How does changing the number of planets affect performance? Why?
