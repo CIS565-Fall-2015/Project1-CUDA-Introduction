@@ -30,7 +30,8 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 ### Questions
 
 * Parts 1 & 2: How does changing the tile and block sizes affect performance? Why?
-	Part 1 :
+	
+	-Part 1 :
 		Number of planets = 4096
 		
 		--------------------------------------
@@ -49,7 +50,7 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 
 	Other than that, we see that reducing the block size and increasing the tile size makes the simulation slower. This might mean that creating blocks is more expensive than creating threads. Hence we must create more threads per block that creating more blocks.
 
-	Part 2 :
+	-Part 2 :
 		Changing the tile and block sizes did not affect the simulation time a lot here. the results are as follows
 		
 		--------------------------------------
@@ -66,7 +67,8 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 
 
 * Part 1: How does changing the number of planets affect performance? Why?
-	Reducing the number of planets speeds up the simulation. The number of planets and the respective FPS is as follows :
+	
+	-Reducing the number of planets speeds up the simulation. The number of planets and the respective FPS is as follows :
 	1. 10000 Planets : 10 FPS
 	2. 8000 Planets : 15 FPS
 	3. 5000 Planets : 36 FPS
@@ -82,5 +84,6 @@ In this part, I wrote a simple CUDA program to do matrix addition, subtraction a
 	
 	
 * Part 2: Without running comparisons of CPU code vs. GPU code, how would you expect the performance to compare? Why? What might be the trade-offs?
-  	The performance of the CPU should be better in this case. We know that the GPU is good in floating point calculations but is slow in memory access. In the case of multiplication, there is a lot of memory access. Hence the GPU implementation might be slower. 
+  	
+	-The performance of the CPU should be better in this case. We know that the GPU is good in floating point calculations but is slow in memory access. In the case of multiplication, there is a lot of memory access. Hence the GPU implementation might be slower. 
   	If the matrices where of very large dimensions, then the faster numerical calculation should overshadow the slow access and the GPU implementation should be faster. The tradeoff should be the time to access memory versus the number of numerical calculations.
