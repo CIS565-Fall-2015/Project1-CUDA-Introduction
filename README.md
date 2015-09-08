@@ -32,9 +32,15 @@ N-Body Sim
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/n-body_sim.png?raw=true)
 
 Performance Analysis
+(1) visualization on
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_visualization_on.png?raw=true)
+(2) visualizaiton off
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_visualization_off.png?raw=true)
+(3) change blockszie to 64
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_blocksize_64(base%20128).png?raw=true)
+(4) change blocksize to 256
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_blocksize_256(base%20128).png?raw=true)
+(5) change planets number to 10000
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_num_planets_10000(base%205000).png?raw=true)
+(6) change planets number to 2000
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_num_planets_2000(base%205000).png?raw=true)
