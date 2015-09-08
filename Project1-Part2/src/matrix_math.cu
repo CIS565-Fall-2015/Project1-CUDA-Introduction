@@ -80,27 +80,69 @@ __global__ void mat_mul(float *A, float *B, float *C, int N) {
 
 void Matrix_Math::kernMatAdd(int N, float *hst_mat_a, float *hst_mat_b, float *hst_mat_c) {
 	int total = N * N;
+
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
 	cudaMemcpy(dev_mat_a, hst_mat_a, total * sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_mat_b, hst_mat_b, total * sizeof(float), cudaMemcpyHostToDevice);
     dim3 fullBlocksPerGrid((total + blockSize - 1) / blockSize);
+
+	cudaEventRecord(start);
 	mat_add<<<fullBlocksPerGrid, threadsPerBlock>>>(dev_mat_a, dev_mat_b, dev_mat_c, N);
+	cudaEventRecord(stop);
+
 	cudaMemcpy(hst_mat_c, dev_mat_c, total * sizeof(float), cudaMemcpyDeviceToHost);
+
+	cudaEventSynchronize(stop);
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+	std::cout << milliseconds << "ms for adding" << std::endl;
 }
 
 void Matrix_Math::kernMatSub(int N, float *hst_mat_a, float *hst_mat_b, float *hst_mat_c) {
     int total = N * N;
+
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
 	cudaMemcpy(dev_mat_a, hst_mat_a, total * sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_mat_b, hst_mat_b, total * sizeof(float), cudaMemcpyHostToDevice);
     dim3 fullBlocksPerGrid((total + blockSize - 1) / blockSize);
+
+	cudaEventRecord(start);
 	mat_sub<<<fullBlocksPerGrid, threadsPerBlock>>>(dev_mat_a, dev_mat_b, dev_mat_c, N);
+	cudaEventRecord(stop);
+
 	cudaMemcpy(hst_mat_c, dev_mat_c, total * sizeof(float), cudaMemcpyDeviceToHost);
+
+	cudaEventSynchronize(stop);
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+	std::cout << milliseconds << "ms for subtracting" << std::endl;
 }
 
 void Matrix_Math::kernMatMul(int N, float *hst_mat_a, float *hst_mat_b, float *hst_mat_c) {
     int total = N * N;
+
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
 	cudaMemcpy(dev_mat_a, hst_mat_a, total * sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_mat_b, hst_mat_b, total * sizeof(float), cudaMemcpyHostToDevice);
     dim3 fullBlocksPerGrid((total + blockSize - 1) / blockSize);
+
+	cudaEventRecord(start);
 	mat_mul<<<fullBlocksPerGrid, threadsPerBlock>>>(dev_mat_a, dev_mat_b, dev_mat_c, N);
+	cudaEventRecord(stop);
+
 	cudaMemcpy(hst_mat_c, dev_mat_c, total * sizeof(float), cudaMemcpyDeviceToHost);
+
+	cudaEventSynchronize(stop);
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+	std::cout << milliseconds << "ms for multiplying" << std::endl;
 }

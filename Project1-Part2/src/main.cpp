@@ -64,14 +64,17 @@ void runCUDA() {
 		hst_mat_b[i] = i * 2.0f;
 	}
 
+	std::cout << "Matrix A" << std::endl;
 	print_mat(hst_mat_a);
+	std::cout << "Matrix B" << std::endl;
 	print_mat(hst_mat_b);
+	std::cout << "Matrix A + B" << std::endl;
 	Matrix_Math::kernMatAdd(N, hst_mat_a, hst_mat_b, hst_mat_c);
 	print_mat(hst_mat_c);
-
+	std::cout << "Matrix A - B" << std::endl;
 	Matrix_Math::kernMatSub(N, hst_mat_a, hst_mat_b, hst_mat_c);
 	print_mat(hst_mat_c);
-
+	std::cout << "Matrix A * B" << std::endl;
 	Matrix_Math::kernMatMul(N, hst_mat_a, hst_mat_b, hst_mat_c);
 	print_mat(hst_mat_c);
 
@@ -82,10 +85,10 @@ void runCUDA() {
 void print_mat(float* mat) {
 
 	for(int i = 0; i < N*N; i++) {
-		if(i%N == 0) {
+		if(i%N == 0 && i > 0) {
 			std::cout << std::endl;
 		}
 		std::cout << mat[i] <<",";
 	}
-	std::cout << std::endl;
+	std::cout << std::endl << std::endl;
 }
