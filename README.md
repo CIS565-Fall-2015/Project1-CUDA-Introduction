@@ -46,6 +46,7 @@ Performance Analysis
 (6) change planets number to 2000
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/performance_analyse_num_planets_2000(base%205000).png?raw=true)
 *Part 2
+
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/part2_timer1.png?raw=true)
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/part2_timer2.png?raw=true)
 ![alt tag](https://github.com/ziyezhou-Jerry/Project1-CUDA-Introduction/blob/master/images/part2_timer3.png?raw=true)
