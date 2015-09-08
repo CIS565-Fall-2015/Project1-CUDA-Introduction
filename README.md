@@ -1,59 +1,44 @@
-CUDA Introduction
-=================
+# CUDA Introduction
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 1**
 
 Terry Sun; Arch Linux, Intel i5-4670, GTX 750
 
-Part1 contains a basic nbody simulation:
+## Part 1: A Basic Nbody Simulation
 
 ![](images/nbody.gif)
 
 (2500 planets, 0.5s per step)
 
-Part2 contains an even more basic matrix math library that provides addition,
-subtraction, and multiplication.
+### Performance
 
-## TODO
-- [ ] write tests for matrix operations
-- [ ] performance analysis
-- [ ] respond to questions
+![](images/nbody_perf_plot.png)
 
-## Part 3: Performance Analysis
+I measured performance by disabling visualization and using `CudaEvent`s to time
+the kernel invocations (measuring the time elapsed for both `kernUpdateVelPos`
+and `kernUpdateAcc`). The graph shows time elapsed (in ms) to update one frame
+at block sizes from 16 to 1024 in steps of 8.
 
-For this project, we will guide you through your performance analysis with some
-basic questions. In the future, you will guide your own performance analysis -
-but these simple questions will always be critical to answer. In general, we
-want you to go above and beyond the suggested performance investigations and
-explore how different aspects of your code impact performance as a whole.
+Code for performance measuring can be found on the `performance` branch.
 
-The provided framerate meter (in the window title) will be a useful base
-metric, but adding your own `cudaTimer`s, etc., will allow you to do more
-fine-grained benchmarking of various parts of your code.
+Changing the number of planets, as expected, increases the time elapsed for the
+kernels, due to a for-loop in the acceleration calculation (which increases
+linearly by the number of total planets in the system. More interestingly, it
+also changes the way that performance reacts to block size (see n=4096 in the
+above plot).
 
-REMEMBER:
-* Performance should always be measured relative to some baseline when
-  possible. A GPU can make your program faster - but by how much?
-* If a change impacts performance, show a comparison. Describe your changes.
-* Describe the methodology you are using to benchmark.
-* Performance plots are a good thing.
+# Part2: An Even More Basic Matrix Library
 
-### Questions
+This library provides addition, subtraction, and multiplication for square
+matrices of arbitrary size.
 
-For Part 1, there are two ways to measure performance:
-* Disable visualization so that the framerate reported will be for the the
-  simulation only, and not be limited to 60 fps. This way, the framerate
-  reported in the window title will be useful.
-  * Change `#define VISUALIZE` to `0`.
-* For tighter timing measurement, you can use CUDA events to measure just the
-  simulation CUDA kernel. Info on this can be found online easily. You will
-  probably have to average over several simulation steps, similar to the way
-  FPS is currently calculated.
+I expect the actual performance of the GPU kernel for addition and subtraction
+to run in constant time and thus to be much faster than the respective CPU
+operations, as CPU addition and subtraction are linear operations. However, the
+GPU operation involves two memory copies of the data (host to device, device to
+host), which are also linear time operations.
 
-**Answer these:**
-
-* Parts 1 & 2: How does changing the tile and block sizes affect performance?
-  Why?
-* Part 1: How does changing the number of planets affect performance? Why?
-* Part 2: Without running comparisons of CPU code vs. GPU code, how would you
-  expect the performance to compare? Why? What might be the trade-offs?
+However, matrix multiplication is a O(n^{1.5}) operation on a CPU and becomes a
+O(n) operation on a GPU (becoming O(3n) after taking into account the 2x memory
+copy). So I would expect multiplication to exhibit much better performance on
+the GPU for larger matrices.
