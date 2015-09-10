@@ -25,9 +25,9 @@ To alter block sizes (shown below) affects fps performance, however, the impact 
 
 Attached is my part-1 test result:
 
-5000 planets, 32-2048 threads per block: 72.9 ~ 73.8 fps
+5000 planets, 32-1024 threads per block: 72.9 ~ 73.8 fps
 
-500000 planets, 2048 threads per block: Nvadia driver crashed
+500000 planets, 1024 threads per block: Nvadia driver crashed
 
 
 Changing tile sizes does have a minor impact on the performance, in light of execution time. For matrix addition and subtraction, smaller block size runs faster, while there is negligible difference for multiplication.
