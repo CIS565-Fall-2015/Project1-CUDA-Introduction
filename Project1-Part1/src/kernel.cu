@@ -184,11 +184,11 @@ __device__ glm::vec3 accelerate(int N, int iSelf, const glm::vec3 *pos) {
 	for (int i = 0; i < N; i++)
 		if (i != iSelf){
 		glm::vec3 dp = pos[i] - my_pos;
-		float rad = 1.0 / glm::length(dp);
+		float rad = 1.0 / (glm::length(dp) + epsilon);
 		acc += planetMass * G * rad * rad * rad * dp;
 		}
 
-	float rad = 1.0 / glm::length(my_pos);
+	float rad = 1.0 / (glm::length(my_pos) + epsilon);
 	acc -= starMass * G * rad * rad * rad * my_pos;
 
     // HINT: You may want to write a helper function that will compute the acceleration at
