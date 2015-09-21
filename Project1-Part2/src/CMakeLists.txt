@@ -1,5 +1,5 @@
 set(SOURCE_FILES
-    “matrix_math.cu"
+    "matrix_math.cu"
     )
 
 cuda_add_library(src

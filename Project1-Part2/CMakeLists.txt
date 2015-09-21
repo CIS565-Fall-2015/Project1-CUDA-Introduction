@@ -66,8 +66,7 @@ endif()
 add_subdirectory(src)
 
 cuda_add_executable(${CMAKE_PROJECT_NAME}
-    "src/main.hpp"
-    "src/main.cpp"
+    "src/matrix_math.cu"
     )
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
