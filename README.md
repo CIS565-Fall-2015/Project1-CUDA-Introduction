@@ -198,8 +198,10 @@ asynchronous.
 **Answer these:**
 
 * Part 1: How does changing the number of planets affect performance? Why?
-* Parts 1 & 2: How does changing the grid and block sizes affect performance?
+* Part 1: How does changing the block count and block size affect performance?
   Why?
+* Part 2: For a larger matrix, how might changing the block count and block
+  size affect performance? Why?
 * Parts 1 & 2: Without running comparisons of CPU code vs. GPU code, how would
   you expect the performance to compare? Why? What might be the trade-offs?
 
