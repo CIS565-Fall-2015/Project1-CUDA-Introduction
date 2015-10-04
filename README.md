@@ -197,11 +197,11 @@ asynchronous.
 
 **Answer these:**
 
+* Part 1: How does changing the number of planets affect performance? Why?
 * Parts 1 & 2: How does changing the grid and block sizes affect performance?
   Why?
-* Part 1: How does changing the number of planets affect performance? Why?
-* Part 2: Without running comparisons of CPU code vs. GPU code, how would you
-  expect the performance to compare? Why? What might be the trade-offs?
+* Parts 1 & 2: Without running comparisons of CPU code vs. GPU code, how would
+  you expect the performance to compare? Why? What might be the trade-offs?
 
 **NOTE: Nsight performance analysis tools *cannot* presently be used on the lab
 computers, as they require administrative access.** If you do not have access
