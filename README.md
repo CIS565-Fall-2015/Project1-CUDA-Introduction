@@ -75,13 +75,17 @@ The following source files are included in the project:
 
 Take a screenshot. Commit and push your code changes.
 
+### 1.2. Write About It
+
+Include your screenshot and a very brief description of the N-body simulation
+in your README.
 
 ## Part 2: Matrix Math
 
 In this part, you'll set up a CUDA project with some simple matrix math
 functionality. Put this in the `Project1-Part2` directory in your repository.
 
-### 1.1. Create Your Project
+### 2.1. Create Your Project
 
 You'll need to copy over all of the boilerplate project-related files from
 Part 1:
@@ -103,7 +107,7 @@ Next, create empty text files for your main function and CUDA kernels:
 As you work through the next steps, find and use relevant code from Part 1 to
 get the new project set up: includes, error checking, initialization, etc.
 
-### 1.2. Setting Up CUDA Memory
+### 2.2. Setting Up CUDA Memory
 
 As discussed in class, there are two separate memory spaces: host memory and
 device memory. Host memory is accessible by the CPU, while device memory is
@@ -134,7 +138,7 @@ These arrays can each be represented as a 1D array of floats:
 You should also create cleanup method(s) to free the CPU and GPU memory you
 allocated. Don't forget to initialize and cleanup in main!
 
-### 1.3. Creating CUDA Kernels
+### 2.3. Creating CUDA Kernels
 
 Given 5x5 matrices A, B, and C (each represented as above), implement the
 following functions as CUDA kernels (`__global__`):
@@ -154,10 +158,14 @@ Tips:
   `cudaMemcpy`.
 * The triple angle brackets `<<< >>>` provide parameters to the CUDA kernel
   invocation: `<<<blocks_per_grid, threads_per_block, ...>>>`.
-* Don't worry if your IDE doesn't understand some CUDA syntax (e.g.
+* Don't worry if your IDE doesn't undestand some CUDA syntax (e.g.
   `__device__` or `<<< >>>`). By default, it may not understand CUDA
   extensions.
 
+### 2.4. Write About It
+
+Include a very brief description of the matrix operations you implemented,
+and show some sample output.
 
 ## Part 3: Performance Analysis
 
